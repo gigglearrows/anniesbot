@@ -20,6 +20,7 @@ class User(Base):
     level = Column(Integer, nullable=False, default=100)
     points = Column(Integer, nullable=False, default=0)
     num_lines = Column(Integer, nullable=False, default=0)
+    num_lines_month = Column(Integer, nullable=False, default=0)
     subscriber = Column(Boolean, nullable=False, default=False)
     _last_seen = Column('last_seen', DateTime)
     _last_active = Column('last_active', DateTime)
@@ -40,6 +41,7 @@ class User(Base):
         self.level = 100
         self.points = 0
         self.num_lines = 0
+        self.num_lines_month = 0
         self.subscriber = False
         self._last_seen = datetime.datetime.now()
         self._last_active = None
@@ -118,6 +120,7 @@ class User(Base):
         user.username_raw = username
         user.level = 2000
         user.num_lines = 0
+        user.num_lines_month = 0
         user.subscriber = True
         user.points = 1234
         user.last_seen = None
@@ -143,6 +146,7 @@ class User(Base):
         self.last_seen = datetime.datetime.now()
         if add_line:
             self.num_lines += 1
+            self.num_lines_month += 1
 
 
 class UserManager(UserDict):

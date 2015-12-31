@@ -17,6 +17,7 @@ autobahn[twisted]
 beautifulsoup4
 requests
 regex
+pylast
 
 # MySQL for python3
 pymysql

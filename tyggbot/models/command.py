@@ -152,7 +152,7 @@ class Command(Base):
             lazy='noload')
 
     MIN_WHISPER_LEVEL = 420
-    BYPASS_DELAY_LEVEL = 2000
+    BYPASS_DELAY_LEVEL = 1000
     BYPASS_SUB_ONLY_LEVEL = 500
     BYPASS_MOD_ONLY_LEVEL = 500
 
@@ -643,6 +643,142 @@ class CommandManager(UserDict):
                                 'bot>user:Updated an already-existing deck. Its ID is 32',
                                 description='This is the output if you set a deck which was added previously.').parse(),
                             ]),
+                    })
+        #Declare rafflecommands
+        raffle_enable_command = Command.dispatch_command('raffle_enable',
+            level=500,
+            description='Enable the custom word raffle')
+        raffle_disable_command = Command.dispatch_command('raffle_disable',
+            level=500,
+            description='Disable the custom word raffle')
+        raffle_draw_command = Command.dispatch_command('raffle',
+            level=1000,
+            description='Pick a random winner that typed the raffle keyword in chat')
+        #Declare arenacommands
+        arena_start_command = Command.dispatch_command('arena_start',
+            level=500,
+            description='Enable the Hearthstone arena win/loss counter')
+        arena_stop_command = Command.dispatch_command('arena_stop',
+            level=500,
+            description='Disable the Hearthstone arena win/loss counter')
+        arena_win_command = Command.dispatch_command('arena_win',
+            level=500,
+            description='Adds a win in the Hearthstone arena')
+        arena_loss_command = Command.dispatch_command('arena_loss',
+            level=500,
+            description='Adds a loss in the Hearthstone arena')
+        arena_edit_command = Command.dispatch_command('arena_edit',
+            level=500,
+            description='Edits the current score in the Hearthstone arena. Format [wins]-[losses] (max 12 wins or 3 losses)')
+        arena_command = Command.dispatch_command('arena',
+            level=100,
+            description='Check the current score in Hearthstone Arena')
+        #Declare queuecommands
+        queue_enable_command = Command.dispatch_command('queue_enable',
+            level=500,
+            description='Enable the queue commands')
+        queue_disable_command = Command.dispatch_command('queue_disable',
+            level=500,
+            description='Disable the queue commands')
+        queue_remove_command = Command.dispatch_command('queue_remove',
+            level=500,
+            description='Removes entered user from the queue')
+        queue_leave_command = Command.dispatch_command('queue_leave',
+            level=100,
+            description='Leave the queue')
+        queue_clear_command = Command.dispatch_command('queue_clear',
+            level=1000,
+            description='Clear the queue')
+        queue_pop_command = Command.dispatch_command('queue_pop',
+            level=500,
+            description='See who is next. It also removes the #1 in queue and the users behind will now be moved 1 spot up')
+        queue_pos_command = Command.dispatch_command('queue_pos',
+            level=100,
+            description='Check your current position in the queue')
+        queue_list_command = Command.dispatch_command('queue_list',
+            level=500,
+            description='Prints out the current queue on the channel in chat')
+
+        self.internal_commands['raffle'] = Command.multiaction_command(
+                level=500,
+                delay_all=0,
+                delay_user=0,
+                default=None,
+                commands={
+                    'enable': raffle_enable_command,
+                    'on': raffle_enable_command,
+                    'start': raffle_enable_command,
+                    'disable': raffle_disable_command,
+                    'off': raffle_disable_command,
+                    'stop': raffle_disable_command,
+                    'word': Command.dispatch_command('raffle_word',
+                        level=500,
+                        description='Set the custom keyword that people can type to join the raffle'),
+                    'draw': raffle_draw_command,
+                    'winner': raffle_draw_command,
+                    'pick': raffle_draw_command,
+                    'choose': raffle_draw_command,
+                    })
+        self.internal_commands['arena'] = Command.multiaction_command(
+                level=100,
+                delay_all=10,
+                delay_user=30,
+                default=None,
+                commands={
+                    'enable': arena_start_command,
+                    'on': arena_start_command,
+                    'start': arena_start_command,
+                    'disable': arena_stop_command,
+                    'off': arena_stop_command,
+                    'stop': arena_stop_command,
+                    'win': arena_win_command,
+                    'won': arena_win_command,
+                    'lose': arena_loss_command,
+                    'loss': arena_loss_command,
+                    'lost': arena_loss_command,
+                    'edit': arena_edit_command,
+                    'set': arena_edit_command,
+                    'score': arena_edit_command,
+                    'nothing': arena_command,
+                    'stats': arena_command,
+                    'progress': arena_command,
+                    })
+        self.internal_commands['queue'] = Command.multiaction_command(
+                level=100,
+                delay_all=1,
+                delay_user=30,
+                default=None,
+                commands={
+                    'enable': queue_enable_command,
+                    'on': queue_enable_command,
+                    'start': queue_enable_command,
+                    'disable': queue_disable_command,
+                    'off': queue_disable_command,
+                    'stop': queue_disable_command,
+                    'add': Command.dispatch_command('queue_add',
+                        level=500,
+                        description='Put a user in the back of the queue'),
+                    'remove': queue_remove_command,
+                    'rem': queue_remove_command,
+                    'delete':  queue_remove_command,
+                    'kick': queue_remove_command,
+                    'join': Command.dispatch_command('queue_join',
+                        level=100,
+                        description='Join the queue'),
+                    'leave': queue_leave_command,
+                    'quit': queue_leave_command,
+                    'exit': queue_leave_command,
+                    'clear': queue_clear_command,
+                    'clr': queue_clear_command,
+                    'pop': queue_pop_command,
+                    'winner': queue_pop_command,
+                    'next': queue_pop_command,
+                    'pos': queue_pos_command,
+                    'position': queue_pos_command,
+                    'number': queue_pos_command,
+                    'nothing': queue_list_command,
+                    'list': queue_list_command,
+                    'show': queue_list_command,
                     })
 
         self.internal_commands['update'] = Command.multiaction_command(

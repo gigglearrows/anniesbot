@@ -36,6 +36,7 @@ from .tbmath import TBMath
 from .tbutil import time_since
 from .tbutil import time_method
 from .actions import Action, ActionQueue
+from .userdispatch import UserDispatch
 
 import wolframalpha
 from pytz import timezone
@@ -252,6 +253,17 @@ class TyggBot:
         self.data_cb['bot_uptime'] = self.c_uptime
 
         self.tbm = TBMath()
+        
+        self.newest_subs = []
+        self.raffleList = []
+        self.sub_queue = []
+        self.queue = []
+        self.queue_active = False
+        self.raffle_active = False
+        self.raffleWord = ''
+        self.arena_active = False
+        self.aWins = 0
+        self.aLoss = 0
 
         self.silent = True if args.silent else self.silent
 
@@ -780,6 +792,9 @@ class TyggBot:
                 add_line = False
 
         source.wrote_message(add_line)
+ 
+        if msg_lower.lower() == self.raffleWord.lower(): 
+            UserDispatch.raffle_count(self, source, msg_raw.lower(), {}, {})
 
     def on_whisper(self, chatconn, event):
         # We use .lower() in case twitch ever starts sending non-lowercased usernames
@@ -788,12 +803,12 @@ class TyggBot:
 
     def on_ping(self, chatconn, event):
         # self.say('Received a ping. Last ping received {} ago'.format(time_since(datetime.now().timestamp(), self.last_ping.timestamp())))
-        log.info('Received a ping. Last ping received {} ago'.format(time_since(datetime.now().timestamp(), self.last_ping.timestamp())))
+        #log.info('Received a ping. Last ping received {} ago'.format(time_since(datetime.now().timestamp(), self.last_ping.timestamp())))
         self.last_ping = datetime.now()
 
     def on_pong(self, chatconn, event):
         # self.say('Received a pong. Last pong received {} ago'.format(time_since(datetime.now().timestamp(), self.last_pong.timestamp())))
-        log.info('Received a pong. Last pong received {} ago'.format(time_since(datetime.now().timestamp(), self.last_pong.timestamp())))
+        #log.info('Received a pong. Last pong received {} ago'.format(time_since(datetime.now().timestamp(), self.last_pong.timestamp())))
         self.last_pong = datetime.now()
 
     def on_action(self, chatconn, event):
@@ -815,7 +830,7 @@ class TyggBot:
 
             # TODO: Implement a better anti-ascii feature.
             if self.settings['ban_ascii']:
-                if (msg_len > 240 and ratio > 0.8) or ratio > 0.93:
+                if (msg_len > 240 and ratio > 0.82) or ratio > 0.93:
                     log.debug('Timeouting {0} because of a high ascii ratio ({1}). Message length: {2}'.format(source.username, ratio, msg_len))
                     self.timeout_user(source, self.ascii_timeout_duration)
                     self.whisper(source.username, 'You have been timed out for {0} seconds because your message contained too many ascii characters.'.format(self.ascii_timeout_duration))

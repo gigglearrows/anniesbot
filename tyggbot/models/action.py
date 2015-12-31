@@ -17,6 +17,7 @@ class ActionParser:
             Dispatch = UserDispatch
         except ImportError:
             from tyggbot.dispatch import Dispatch
+            log.exception('aaaaaa')
         except:
             from tyggbot.dispatch import Dispatch
             log.exception('Something went wrong while attemting to import UserDispatch')

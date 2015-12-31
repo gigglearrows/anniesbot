@@ -2,6 +2,7 @@ import json
 import logging
 import threading
 
+from tyggbot.dispatch import Dispatch
 log = logging.getLogger('tyggbot')
 
 
@@ -29,6 +30,13 @@ class WebSocketServer:
                     log.info('Binary message received: {0} bytes'.format(len(payload)))
                 else:
                     log.info('Text message received: {0}'.format(payload.decode('utf8')))
+                from tyggbot.models.action import ActionParser
+                if payload.decode('utf8') == 'clear_lines_month':
+                    try:
+                        Dispatch.clear_lines_month(ActionParser.bot, None, None, None, None)
+                        self.sendClose()
+                    except:
+                        log.exception('Uncaught exception in WebsocketServer onMessage')
 
             def onClose(self, wasClean, code, reason):
                 log.info('WebSocket connection closed: {0}'.format(reason))
