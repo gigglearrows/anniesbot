@@ -1,0 +1,71 @@
+{% extends "admin/layout.html" %}
+{% set active_page = 'admin_timers' %}
+{% block title %}Admin - Timers{% endblock %}
+{% block body %}
+{% if created %}
+<div class="ui success message">
+    <i class="close icon"></i>
+    <div class="header">Your Timer was created successfully.</div>
+</div>
+{% elif edited %}
+<div class="ui success message">
+    <i class="close icon"></i>
+    <div class="header">Your Timer was edited successfully.</div>
+</div>
+{% endif %}
+<button class="ui button create-timer green"><i class="icon add"></i> <strong>Create Timer</strong></button>
+<h2>Timers</h2>
+<table class="ui table basic">
+    <thead>
+        <tr>
+            <th class="collapsing">Name</th>
+            <th class="collapsing">Interval online</th>
+            <th class="collapsing">Interval offline</th>
+            <th>Message</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for row in timers %}
+        <tr data-id="{{row.id}}" data-enabled="{{1 if row.enabled else 0}}">
+            <td class="collapsing">{{row.name}}</td>
+            <td class="collapsing">{{ 'Disabled' if row.interval_online == 0 else row.interval_online }}</td>
+            <td class="collapsing">{{ 'Disabled' if row.interval_offline == 0 else row.interval_offline }}</td>
+            <td>{{row.action.response}}</td>
+            {% include 'admin/helper/row_action.html' %}
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<div class="ui modal remove-timer">
+    <i class="close icon"></i>
+    <div class="header">Confirm Action</div>
+    <div class="content">
+        <div class="description">
+            Are you sure you want to remove this timer? This action is irreversible.
+        </div>
+    </div>
+    <div class="actions">
+        <div class="ui approve button">Remove</div>
+        <div class="ui cancel button">Cancel</div>
+    </div>
+</div>
+{% endblock %}
+{% block footer %}
+<script src="/static/scripts/admin/create_row.js"></script>
+<script type="text/javascript">
+$(document).ready(function() {
+    $('button.create-timer').click(function() {
+        document.location.href = '/admin/timers/create';
+    });
+
+    enable_edit_row('timers');
+    enable_remove_row('remove-timer', 'remove_timer');
+    enable_toggle_row('toggle_timer');
+
+    $('.message .close').on('click', function() {
+        $(this).closest('.message').transition('fade');
+    });
+});
+</script>
+{% endblock %}

@@ -10,29 +10,27 @@ import logging
 import subprocess
 import datetime
 import urllib
-from PIL import Image
 
-from tyggbot.tyggbot import TyggBot
-from tyggbot.web.models import api
-from tyggbot.web.routes import admin
-from tyggbot.web.models import errors
-from tyggbot.models.db import DBManager
-from tyggbot.tbutil import load_config, init_logging, time_nonclass_method
-from tyggbot.models.deck import Deck
-from tyggbot.models.command import CommandExample
-from tyggbot.models.user import User
-from tyggbot.models.duel import UserDuelStats
-from tyggbot.models.stream import Stream, StreamChunkHighlight
-from tyggbot.models.webcontent import WebContent
-from tyggbot.models.time import TimeManager
-from tyggbot.models.pleblist import PleblistSong
-from tyggbot.models.sock import SocketClientManager
-from tyggbot.apiwrappers import TwitchAPI
-from tyggbot.tbutil import time_since
-from tyggbot.tbutil import find
+from pajbot.bot import Bot
+from pajbot.web.models import api
+from pajbot.web.routes import admin
+from pajbot.web.models import errors
+from pajbot.models.db import DBManager
+from pajbot.tbutil import load_config, init_logging, time_nonclass_method
+from pajbot.models.deck import Deck
+from pajbot.models.command import CommandExample
+from pajbot.models.user import User
+from pajbot.models.duel import UserDuelStats
+from pajbot.models.stream import Stream, StreamChunkHighlight
+from pajbot.models.webcontent import WebContent
+from pajbot.models.time import TimeManager
+from pajbot.models.pleblist import PleblistSong
+from pajbot.models.sock import SocketClientManager
+from pajbot.apiwrappers import TwitchAPI
+from pajbot.tbutil import time_since
+from pajbot.tbutil import find
 
 import markdown
-from apscheduler.schedulers.background import BackgroundScheduler
 from flask import Flask
 from flask import request
 from flask import render_template
@@ -48,12 +46,8 @@ from flask_oauthlib.client import OAuthException
 # from flask import jsonify
 from sqlalchemy import func, cast, Date
 
-init_logging('tyggbot')
-log = logging.getLogger('tyggbot')
-
-cron = BackgroundScheduler(daemon=True)
-
-cron.start()
+init_logging('pajbot')
+log = logging.getLogger('pajbot')
 
 app = Flask(__name__)
 app._static_folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static')
@@ -98,11 +92,12 @@ if 'logo' not in config['web']:
                 data = response.read()
                 out_file.write(data)
                 try:
+                    from PIL import Image
                     im = Image.open(logo_raw)
                     im.thumbnail((64, 64), Image.ANTIALIAS)
                     im.save(logo_tn, 'png')
                 except:
-                    log.exception('asd')
+                    pass
             config.set('web', 'logo', 'set')
             log.info('set logo')
     except:
@@ -166,38 +161,37 @@ def nocache(view):
 
 def update_commands(signal_id):
     global bot_commands_list
-    from tyggbot.models.command import CommandManager
-    bot_commands = CommandManager(None).load(load_examples=True)
+    from pajbot.models.command import CommandManager
+    from pajbot.models.module import ModuleManager
+    bot_commands = CommandManager(
+            socket_manager=None,
+            module_manager=ModuleManager(None).load(),
+            bot=None).load(load_examples=True)
     bot_commands_list = bot_commands.parse_for_web()
 
     bot_commands_list = sorted(bot_commands_list, key=lambda x: (x.id or -1, x.main_alias))
     del bot_commands
 
-def get_highlight_thumbnails(signal_id):
-    with DBManager.create_session_scope() as db_session:
-        for highlight in db_session.query(StreamChunkHighlight).filter_by(thumbnail=None):
-            if highlight.stream_chunk.video_preview_image_url is not None:
-                log.info('Getting thumbnail for highlight {}'.format(highlight.id))
-                image_url = highlight.stream_chunk.video_preview_image_url
-                out_path = 'static/images/highlights/{}.jpg'.format(highlight.id)
-                try:
-                    with urllib.request.urlopen(image_url) as response, open(out_path, 'wb') as out_file:
-                        data = response.read()
-                        out_file.write(data)
-                    highlight.thumbnail = True
-                    log.info('Finished getting thumbnail for highlight {}'.format(highlight.id))
-                except urllib.error.HTTPError:
-                    log.info('404d getting thumbnail for highlight {}'.format(highlight.id))
-                    highlight.thumbnail = False
 
 update_commands(26)
 try:
     import uwsgi
+    from uwsgidecorators import thread, timer
     uwsgi.register_signal(26, "worker", update_commands)
     uwsgi.add_timer(26, 60 * 10)
 
-    uwsgi.register_signal(26, "worker", get_highlight_thumbnails)
-    uwsgi.add_timer(27, 10)
+    @thread
+    @timer(5)
+    def get_highlight_thumbnails(no_clue_what_this_does):
+        from pajbot.web.models.thumbnail import StreamThumbnailWriter
+        with DBManager.create_session_scope() as db_session:
+            highlights = db_session.query(StreamChunkHighlight).filter_by(thumbnail=None).all()
+            if len(highlights) > 0:
+                log.info('Writing {} thumbnails...'.format(len(highlights)))
+                StreamThumbnailWriter(config['main']['streamer'], [h.id for h in highlights])
+                log.info('Done!')
+                for highlight in highlights:
+                    highlight.thumbnail = True
 except ImportError:
     pass
 
@@ -479,7 +473,7 @@ def highlights():
             day=highlight.created_at.day))
     try:
         return render_template('highlights.html',
-                highlights=highlights[:5],
+                highlights=highlights[:10],
                 dates_with_highlights=set(dates_with_highlights))
     finally:
         session.close()
@@ -516,10 +510,13 @@ def pleblist_history_stream(stream_id):
         songs = session.query(PleblistSong).filter(PleblistSong.stream_id == stream.id).order_by(PleblistSong.date_added.asc(), PleblistSong.date_played.asc()).all()
         total_length_left = sum([song.song_info.duration if song.date_played is None and song.song_info is not None else 0 for song in songs])
 
+        first_unplayed_song = find(lambda song: song.date_played is None, songs)
+
         return render_template('pleblist_history.html',
                 stream=stream,
                 songs=songs,
-                total_length_left=total_length_left)
+                total_length_left=total_length_left,
+                first_unplayed_song=first_unplayed_song)
 
 
 @app.route('/discord')
@@ -650,12 +647,17 @@ if 'pleblist' in modules:
 nav_bar_admin_header = []
 nav_bar_admin_header.append(('/', 'home', 'Home'))
 nav_bar_admin_header.append(('/admin/', 'admin_home', 'Admin Home'))
-nav_bar_admin_header.append(('/admin/banphrases/', 'admin_banphrases', 'Banphrases'))
+nav_bar_admin_header.append(([
+    ('/admin/banphrases/', 'admin_banphrases', 'Banphrases'),
+    ('/admin/links/blacklist/', 'admin_links_blacklist', 'Blacklisted links'),
+    ('/admin/links/whitelist/', 'admin_links_whitelist', 'Whitelisted links'),
+    ], None, 'Filters'))
 nav_bar_admin_header.append(('/admin/commands/', 'admin_commands', 'Commands'))
-nav_bar_admin_header.append(('/admin/links/blacklist/', 'admin_links_blacklist', 'Blacklisted links'))
-nav_bar_admin_header.append(('/admin/links/whitelist/', 'admin_links_whitelist', 'Whitelisted links'))
+nav_bar_admin_header.append(('/admin/timers/', 'admin_timers', 'Timers'))
+nav_bar_admin_header.append(('/admin/moderators/', 'admin_moderators', 'Moderators'))
+nav_bar_admin_header.append(('/admin/modules/', 'admin_modules', 'Modules'))
 
-version = TyggBot.version
+version = Bot.version
 last_commit = ''
 commit_number = 0
 try:
