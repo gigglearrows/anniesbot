@@ -100,7 +100,7 @@ class DuelModule(BaseModule):
                 pass
 
         if source.duel_target is not False:
-            bot.whisper(source.username, 'Volcania You already have a duel request active with {}. Type !cancelduel to cancel your duel request.'.format(source.duel_target.username_raw))
+            bot.whisper(source.username, 'You already have a duel request active with {}. Type !cancelduel to cancel your duel request.'.format(source.duel_target.username_raw))
             return False
 
         if user == source:
@@ -108,11 +108,11 @@ class DuelModule(BaseModule):
             return False
 
         if user.last_active is None or (datetime.datetime.now() - user._last_active).total_seconds() > 5 * 60:
-            bot.whisper(source.username, 'Volcania This user has not been active in chat within the last 5 minutes. Get them to type in chat before sending another challenge')
+            bot.whisper(source.username, 'This user has not been active in chat within the last 5 minutes. Get them to type in chat before sending another challenge')
             return False
 
         if user.points < duel_price or source.points < duel_price:
-            bot.whisper(source.username, 'Volcania You or your target do not have more than {} points, therefore you cannot duel for that amount.'.format(duel_price))
+            bot.whisper(source.username, 'You or your target do not have more than {} points, therefore you cannot duel for that amount.'.format(duel_price))
             return False
 
         init_dueling_variables(user)
@@ -121,10 +121,10 @@ class DuelModule(BaseModule):
             user.duel_request = source
             source.duel_target = user
             user.duel_price = duel_price
-            bot.whisper(user.username, 'Volcania You have been challenged to a duel by {} for {} points. You can either !accept or !deny this challenge.'.format(source.username_raw, duel_price))
-            bot.whisper(source.username, 'Volcania You have challenged {} for {} points'.format(user.username_raw, duel_price))
+            bot.whisper(user.username, 'You have been challenged to a duel by {} for {} points. You can either !accept or !deny this challenge.'.format(source.username_raw, duel_price))
+            bot.whisper(source.username, 'You have challenged {} for {} points'.format(user.username_raw, duel_price))
         else:
-            bot.whisper(source.username, 'Volcania This person is already being challenged by {}. Ask them to answer the offer by typing !deny or !accept'.format(user.duel_request.username_raw))
+            bot.whisper(source.username, 'This person is already being challenged by {}. Ask them to answer the offer by typing !deny or !accept'.format(user.duel_request.username_raw))
 
     def cancel_duel(self, **options):
         """
@@ -140,7 +140,7 @@ class DuelModule(BaseModule):
         init_dueling_variables(source)
 
         if source.duel_target is not False:
-            bot.whisper(source.username, 'Volcania You have cancelled the duel vs {}'.format(source.duel_target.username_raw))
+            bot.whisper(source.username, 'You have cancelled the duel vs {}'.format(source.duel_target.username_raw))
             source.duel_target.duel_request = False
             source.duel_target = False
             source.duel_request = False
@@ -161,9 +161,10 @@ class DuelModule(BaseModule):
 
         if source.duel_request is not False:
             if source.points < source.duel_price or source.duel_request.points < source.duel_price:
-                bot.whisper(source.username, 'Volcania Your duel request with {} was cancelled due to one of you not having enough points.'.format(source.duel_request.username_raw))
-                bot.whisper(source.duel_request.username, 'Volcania Your duel request with {} was cancelled due to one of you not having enough points.'.format(source.username_raw))
-                source.duel_request = None
+                bot.whisper(source.username, 'Your duel request with {} was cancelled due to one of you not having enough points.'.format(source.duel_request.username_raw))
+                bot.whisper(source.duel_request.username, 'Your duel request with {} was cancelled due to one of you not having enough points.'.format(source.username_raw))
+                source.duel_request.duel_target = False
+                source.duel_request = False
                 return False
             source.points -= source.duel_price
             source.duel_request.points -= source.duel_price
@@ -179,7 +180,7 @@ class DuelModule(BaseModule):
             bot.duel_manager.user_lost(loser, source.duel_price)
 
             win_message = []
-            win_message.append('Volcania {} won the duel vs {} PogChamp '.format(winner.username_raw, loser.username_raw))
+            win_message.append('{} won the duel vs {} PogChamp '.format(winner.username_raw, loser.username_raw))
             if source.duel_price > 0:
                 win_message.append('The pot was {}, the winner gets his bet back + {} points'.format(source.duel_price, winning_pot))
             bot.say(*win_message)
@@ -202,8 +203,8 @@ class DuelModule(BaseModule):
         init_dueling_variables(source)
 
         if source.duel_request is not False:
-            bot.whisper(source.username, 'Volcania You have declined the duel vs {}'.format(source.duel_request.username_raw))
-            bot.whisper(source.duel_request.username, 'Volcania {} declined the duel challenge with you.'.format(source.username_raw))
+            bot.whisper(source.username, 'You have declined the duel vs {}'.format(source.duel_request.username_raw))
+            bot.whisper(source.duel_request.username, '{} declined the duel challenge with you.'.format(source.username_raw))
             source.duel_request.duel_target = False
             source.duel_request = False
 
@@ -230,7 +231,7 @@ class DuelModule(BaseModule):
         if len(msg) > 0:
             bot.whisper(source.username, '. '.join(msg))
         else:
-            bot.whisper(source.username, 'Volcania You have no duel request or duel target. Type !duel USERNAME POT to duel someone!')
+            bot.whisper(source.username, 'You have no duel request or duel target. Type !duel USERNAME POT to duel someone!')
 
     def get_duel_stats(self, **options):
         """
@@ -241,7 +242,7 @@ class DuelModule(BaseModule):
         source = options['source']
 
         if source.duel_stats is None:
-            bot.whisper(source.username, 'Volcania You have no recorded duels.')
+            bot.whisper(source.username, 'You have no recorded duels.')
             return True
 
-        bot.whisper(source.username, 'Volcania duels: {ds.duels_total} winrate: {ds.winrate:.2f}% streak: {ds.current_streak} profit: {ds.profit}'.format(ds=source.duel_stats))
+        bot.whisper(source.username, 'duels: {ds.duels_total} winrate: {ds.winrate:.2f}% streak: {ds.current_streak} profit: {ds.profit}'.format(ds=source.duel_stats))

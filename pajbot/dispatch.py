@@ -149,11 +149,11 @@ class Dispatch:
                 }
 
         if num_lines_month <= 0:
-            bot.me('Volcania {0} has not written anything in this channel this month ... BibleThump'.format(username))
+            bot.me('{0} has not written anything in this channel this month ... BibleThump'.format(username))
         else:
             query_data = bot.users.db_session.query(func.count(User.id)).filter(User.num_lines_month > num_lines_month).one()
             
-            bot.me('Volcania {0} is rank # {1} on this months lines leaderboard! 4Head'.format(username, int(query_data[0] + 1)))
+            bot.me('{0} is rank # {1} on this months lines leaderboard! 4Head'.format(username, int(query_data[0] + 1)))
 
    
 
@@ -178,6 +178,7 @@ class Dispatch:
             log.error('caught exception: {0}'.format(e))
 
     def math(bot, source, message, event, args):
+        log.warn('Dispatch math is deprecated. Use the math module.')
         if message:
             message = message.replace('pi', str(math.pi))
             message = message.replace('e', str(math.e))
@@ -196,9 +197,9 @@ class Dispatch:
                         emote = 'Kreygasm'
                     elif expr_res == 420 or expr_res == 420.0:
                         emote = 'CiGrip'
-                    res = 'Volcania {2}, {0} {1}'.format(expr_res, emote, source.username)
+                    res = '{2}, {0} {1}'.format(expr_res, emote, source.username)
             except TimeoutException as e:
-                res = 'Volcania timed out DansGame'
+                res = 'timed out DansGame'
                 log.error('Timeout exception: {0}'.format(e))
             except Exception as e:
                 log.error('Uncaught exception: {0}'.format(e))
@@ -214,7 +215,7 @@ class Dispatch:
 
             url = 'http://multitwitch.tv/' + '/'.join(streams)
 
-            bot.say('Volcania {0}, {1}'.format(source.username, url))
+            bot.say('{0}, {1}'.format(source.username, url))
 
     def ab(bot, source, message, event, args):
         if message:
@@ -252,7 +253,7 @@ class Dispatch:
             options, phrase = bot.banphrase_manager.parse_banphrase_arguments(message)
 
             if options is False:
-                bot.whisper(source.username, 'Volcania Invalid banphrase')
+                bot.whisper(source.username, 'Invalid banphrase')
                 return False
 
             options['added_by'] = source.id
@@ -260,20 +261,20 @@ class Dispatch:
             banphrase, new_banphrase = bot.banphrase_manager.create_banphrase(phrase, **options)
 
             if new_banphrase is True:
-                bot.whisper(source.username, 'Volcania Added your banphrase (ID: {banphrase.id})'.format(banphrase=banphrase))
+                bot.whisper(source.username, 'Added your banphrase (ID: {banphrase.id})'.format(banphrase=banphrase))
                 return True
 
             banphrase.set(**options)
             DBManager.session_add_expunge(banphrase)
-            bot.whisper(source.username, 'Volcania Updated your banphrase (ID: {banphrase.id}) with ({what})'.format(banphrase=banphrase, what=', '.join([key for key in options])))
+            bot.whisper(source.username, 'Updated your banphrase (ID: {banphrase.id}) with ({what})'.format(banphrase=banphrase, what=', '.join([key for key in options])))
 
     def add_win(bot, source, message, event, args):
         bot.kvi['br_wins'].inc()
-        bot.me('Volcania {0} added a BR win!'.format(source.username))
+        bot.me('{0} added a BR win!'.format(source.username))
         log.debug('{0} added a BR win!'.format(source.username))
 
     def add_command(bot, source, message, event, args):
-        """Dispatch method for creating and editing commands.
+        """Dispatch method for creating commands.
         Usage: !add command ALIAS [options] RESPONSE
         Multiple options available:
         --whisper/--no-whisper
@@ -289,13 +290,13 @@ class Dispatch:
             # Make sure we got both an alias and a response
             message_parts = message.split()
             if len(message_parts) < 2:
-                bot.whisper(source.username, 'Volcania Usage: !add command ALIAS [options] RESPONSE')
+                bot.whisper(source.username, 'Usage: !add command ALIAS [options] RESPONSE')
                 return False
 
             options, response = bot.commands.parse_command_arguments(message_parts[1:])
 
             if options is False:
-                bot.whisper(source.username, 'Volcania Invalid command')
+                bot.whisper(source.username, 'Invalid command')
                 return False
 
             alias_str = message_parts[0].replace('!', '').lower()
@@ -314,10 +315,62 @@ class Dispatch:
                     'message': response,
                     }
 
-            command, new_command = bot.commands.create_command(alias_str, action=action, **options)
+            command, new_command, alias_matched = bot.commands.create_command(alias_str, action=action, **options)
             if new_command is True:
-                bot.whisper(source.username, 'Volcania Added your command (ID: {command.id})'.format(command=command))
+                bot.whisper(source.username, 'Added your command (ID: {command.id})'.format(command=command))
                 return True
+
+            # At least one alias is already in use, notify the user to use !edit command instead
+            bot.whisper(source.username, 'The alias {} is already in use. To edit that command, use !edit command instead of !add command.'.format(alias_matched))
+            return False
+
+    def edit_command(bot, source, message, event, args):
+        """Dispatch method for editing commands.
+        Usage: !edit command ALIAS [options] RESPONSE
+        Multiple options available:
+        --whisper/--no-whisper
+        --reply/--no-reply
+        --modonly/--no-modonly
+        --cd CD
+        --usercd USERCD
+        --level LEVEL
+        --cost COST
+        """
+
+        if message:
+            # Make sure we got both an alias and a response
+            message_parts = message.split()
+            if len(message_parts) < 2:
+                bot.whisper(source.username, 'Usage: !add command ALIAS [options] RESPONSE')
+                return False
+
+            options, response = bot.commands.parse_command_arguments(message_parts[1:])
+
+            if options is False:
+                bot.whisper(source.username, 'Invalid command')
+                return False
+
+            alias = message_parts[0].replace('!', '').lower()
+            type = 'say'
+            if options['whisper'] is True:
+                type = 'whisper'
+            elif options['reply'] is True:
+                type = 'reply'
+            elif response.startswith('/me') or response.startswith('.me'):
+                type = 'me'
+                response = ' '.join(response.split(' ')[1:])
+            elif options['whisper'] is False or options['reply'] is False:
+                type = 'say'
+            action = {
+                    'type': type,
+                    'message': response,
+                    }
+
+            command = bot.commands.get(alias, None)
+
+            if command is None:
+                bot.whisper(source.username, 'No command found with the alias {}. Did you mean to create the command? If so, use !add command instead.'.format(alias))
+                return False
 
             if len(action['message']) > 0:
                 options['action'] = action
@@ -327,11 +380,11 @@ class Dispatch:
                         'message': command.action.response,
                         }
             bot.commands.edit_command(command, **options)
-            bot.whisper(source.username, 'Volcania Updated the command (ID: {command.id})'.format(command=command))
+            bot.whisper(source.username, 'Updated the command (ID: {command.id})'.format(command=command))
 
     def add_funccommand(bot, source, message, event, args):
-        """Dispatch method for creating and editing function commands.
-        Usage: !add command ALIAS [options] CALLBACK
+        """Dispatch method for creating function commands.
+        Usage: !add funccommand ALIAS [options] CALLBACK
         Multiple options available:
         --cd CD
         --usercd USERCD
@@ -344,13 +397,13 @@ class Dispatch:
             # Make sure we got both an alias and a response
             message_parts = message.split(' ')
             if len(message_parts) < 2:
-                bot.whisper(source.username, 'Volcania Usage: !add funccommand ALIAS [options] CALLBACK')
+                bot.whisper(source.username, 'Usage: !add funccommand ALIAS [options] CALLBACK')
                 return False
 
             options, response = bot.commands.parse_command_arguments(message_parts[1:])
 
             if options is False:
-                bot.whisper(source.username, 'Volcania Invalid command')
+                bot.whisper(source.username, 'Invalid command')
                 return False
 
             alias_str = message_parts[0].replace('!', '').lower()
@@ -359,15 +412,55 @@ class Dispatch:
                     'cb': response.strip(),
                     }
 
-            command, new_command = bot.commands.create_command(alias_str, action=action, **options)
+            command, new_command, alias_matched = bot.commands.create_command(alias_str, action=action, **options)
             if new_command is True:
-                bot.whisper(source.username, 'Volcania Added your command (ID: {command.id})'.format(command=command))
+                bot.whisper(source.username, 'Added your command (ID: {command.id})'.format(command=command))
                 return True
+
+            # At least one alias is already in use, notify the user to use !edit command instead
+            bot.whisper(source.username, 'The alias {} is already in use. To edit that command, use !edit command instead of !add funccommand.'.format(alias_matched))
+            return False
+
+    def edit_funccommand(bot, source, message, event, args):
+        """Dispatch method for editing function commands.
+        Usage: !edit funccommand ALIAS [options] CALLBACK
+        Multiple options available:
+        --cd CD
+        --usercd USERCD
+        --level LEVEL
+        --cost COST
+        --modonly/--no-modonly
+        """
+
+        if message:
+            # Make sure we got both an alias and a response
+            message_parts = message.split(' ')
+            if len(message_parts) < 2:
+                bot.whisper(source.username, 'Usage: !add funccommand ALIAS [options] CALLBACK')
+                return False
+
+            options, response = bot.commands.parse_command_arguments(message_parts[1:])
+
+            if options is False:
+                bot.whisper(source.username, 'Invalid command')
+                return False
+
+            alias = message_parts[0].replace('!', '').lower()
+            action = {
+                    'type': 'func',
+                    'cb': response.strip(),
+                    }
+
+            command = bot.commands.get(alias, None)
+
+            if command is None:
+                bot.whisper(source.username, 'No command found with the alias {}. Did you mean to create the command? If so, use !add funccommand instead.'.format(alias))
+                return False
 
             if len(action['cb']) > 0:
                 options['action'] = action
             bot.commands.edit_command(command, **options)
-            bot.whisper(source.username, 'Volcania Updated the command (ID: {command.id})'.format(command=command))
+            bot.whisper(source.username, 'Updated the command (ID: {command.id})'.format(command=command))
 
     def remove_banphrase(bot, source, message, event, args):
         if message:
@@ -380,18 +473,18 @@ class Dispatch:
             banphrase = bot.banphrase_manager.find_match(message=message, id=id)
 
             if banphrase is None:
-                bot.whisper(source.username, 'Volcania No banphrase with the given parameters found')
+                bot.whisper(source.username, 'No banphrase with the given parameters found')
                 return False
 
-            bot.whisper(source.username, 'Volcania Successfully removed banphrase with id {0}'.format(banphrase.id))
+            bot.whisper(source.username, 'Successfully removed banphrase with id {0}'.format(banphrase.id))
             bot.banphrase_manager.remove_banphrase(banphrase)
         else:
-            bot.whisper(source.username, 'Volcania Usage: !remove banphrase (BANPHRASE_ID)')
+            bot.whisper(source.username, 'Usage: !remove banphrase (BANPHRASE_ID)')
             return False
 
     def remove_win(bot, source, message, event, args):
         bot.kvi['br_wins'].dec()
-        bot.me('Volcania {0} removed a BR win!'.format(source.username))
+        bot.me('{0} removed a BR win!'.format(source.username))
         log.debug('{0} removed a BR win!'.format(source.username))
 
     def add_alias(bot, source, message, event, args):
@@ -404,7 +497,7 @@ class Dispatch:
             # Make sure we got both an existing alias and at least one new alias
             message_parts = message.split()
             if len(message_parts) < 2:
-                bot.whisper(source.username, "Volcania Usage: !add alias existingalias newalias")
+                bot.whisper(source.username, "Usage: !add alias existingalias newalias")
                 return False
 
             existing_alias = message_parts[0]
@@ -413,7 +506,7 @@ class Dispatch:
             already_used_aliases = []
 
             if existing_alias not in bot.commands:
-                bot.whisper(source.username, 'Volcania No command called "{0}" found'.format(existing_alias))
+                bot.whisper(source.username, 'No command called "{0}" found'.format(existing_alias))
                 return False
 
             command = bot.commands[existing_alias]
@@ -427,11 +520,11 @@ class Dispatch:
 
             if len(added_aliases) > 0:
                 command.command += '|' + '|'.join(added_aliases)
-                bot.whisper(source.username, 'Volcania Successfully added the aliases {0} to {1}'.format(', '.join(added_aliases), existing_alias))
+                bot.whisper(source.username, 'Successfully added the aliases {0} to {1}'.format(', '.join(added_aliases), existing_alias))
             if len(already_used_aliases) > 0:
-                bot.whisper(source.username, 'Volcania The following aliases were already in use: {0}'.format(', '.join(already_used_aliases)))
+                bot.whisper(source.username, 'The following aliases were already in use: {0}'.format(', '.join(already_used_aliases)))
         else:
-            bot.whisper(source.username, "Volcania Usage: !add alias existingalias newalias")
+            bot.whisper(source.username, "Usage: !add alias existingalias newalias")
 
     def remove_alias(bot, source, message, event, args):
         """Dispatch method for removing aliases from a command.
@@ -440,7 +533,7 @@ class Dispatch:
             aliases = re.split('\|| ', message.lower())
             log.info(aliases)
             if len(aliases) < 1:
-                bot.whisper(source.username, "Volcania Usage: !remove alias EXISTINGALIAS")
+                bot.whisper(source.username, "Usage: !remove alias EXISTINGALIAS")
                 return False
 
             num_removed = 0
@@ -456,7 +549,7 @@ class Dispatch:
                 current_aliases.remove(alias)
 
                 if len(current_aliases) == 0:
-                    bot.whisper(source.username, "Volcania {0} is the only remaining alias for this command and can't be removed.".format(alias))
+                    bot.whisper(source.username, "{0} is the only remaining alias for this command and can't be removed.".format(alias))
                     continue
 
                 command.command = '|'.join(current_aliases)
@@ -465,13 +558,13 @@ class Dispatch:
 
             whisper_str = ''
             if num_removed > 0:
-                whisper_str = 'Volcania Successfully removed {0} aliases.'.format(num_removed)
+                whisper_str = 'Successfully removed {0} aliases.'.format(num_removed)
             if len(commands_not_found) > 0:
                 whisper_str += ' Aliases {0} not found'.format(', '.join(commands_not_found))
             if len(whisper_str) > 0:
                 bot.whisper(source.username, whisper_str)
         else:
-            bot.whisper(source.username, "Volcania Usage: !remove alias EXISTINGALIAS")
+            bot.whisper(source.username, "Usage: !remove alias EXISTINGALIAS")
 
     def remove_command(bot, source, message, event, args):
         if message:
@@ -494,17 +587,22 @@ class Dispatch:
                         break
 
             if command is None:
-                bot.whisper(source.username, 'Volcania No command with the given parameters found')
+                bot.whisper(source.username, 'No command with the given parameters found')
                 return False
 
-            if (not command.action.type == 'message' and source.level < 2000) or command.id == -1:
-                bot.whisper(source.username, 'Volcania That command is not a normal command, it cannot be removed by you.')
+            if command.id == -1:
+                bot.whisper(source.username, 'That command is an internal command, it cannot be removed.')
                 return False
 
-            bot.whisper(source.username, 'Volcania Successfully removed command with id {0}'.format(command.id))
+            if source.level < 2000:
+                if command.action is not None and not command.action.type == 'message':
+                    bot.whisper(source.username, 'That command is not a normal command, it cannot be removed by you.')
+                    return False
+
+            bot.whisper(source.username, 'Successfully removed command with id {0}'.format(command.id))
             bot.commands.remove_command(command)
         else:
-            bot.whisper(source.username, 'Volcania Usage: !remove command (COMMAND_ID|COMMAND_ALIAS)')
+            bot.whisper(source.username, 'Usage: !remove command (COMMAND_ID|COMMAND_ALIAS)')
 
     def add_link_blacklist(bot, source, message, event, args):
         parts = message.split(' ')
@@ -517,9 +615,9 @@ class Dispatch:
                     bot.link_checker.blacklist_url(link, level=int(parts[0]))
         except:
             log.exception("Unhandled exception in add_link")
-            bot.whisper(source.username, "Volcania Some error occurred white adding your links")
+            bot.whisper(source.username, "Some error occurred white adding your links")
 
-        bot.whisper(source.username, 'Volcania Successfully added your links')
+        bot.whisper(source.username, 'Successfully added your links')
 
     def add_link_whitelist(bot, source, message, event, args):
         parts = message.split(' ')
@@ -529,9 +627,9 @@ class Dispatch:
                 bot.link_checker.whitelist_url(link)
         except:
             log.exception("Unhandled exception in add_link")
-            bot.whisper(source.username, "Volcania Some error occurred white adding your links")
+            bot.whisper(source.username, "Some error occurred white adding your links")
 
-        bot.whisper(source.username, 'Volcania Successfully added your links')
+        bot.whisper(source.username, 'Successfully added your links')
 
     def remove_link_blacklist(bot, source, message, event, args):
         parts = message.split(' ')
@@ -540,9 +638,9 @@ class Dispatch:
                 bot.link_checker.unlist_url(link, 'blacklist')
         except:
             log.exception("Unhandled exception in add_link")
-            bot.whisper(source.username, "Volcania Some error occurred white adding your links")
+            bot.whisper(source.username, "Some error occurred white adding your links")
 
-        bot.whisper(source.username, 'Volcania Successfully removed your links')
+        bot.whisper(source.username, 'Successfully removed your links')
 
     def remove_link_whitelist(bot, source, message, event, args):
         parts = message.split(' ')
@@ -551,9 +649,9 @@ class Dispatch:
                 bot.link_checker.unlist_url(link, 'whitelist')
         except:
             log.exception("Unhandled exception in add_link")
-            bot.whisper(source.username, "Volcania Some error occurred white adding your links")
+            bot.whisper(source.username, "Some error occurred white adding your links")
 
-        bot.whisper(source.username, 'Volcania Successfully removed your links')
+        bot.whisper(source.username, 'Successfully removed your links')
 
     def debug_command(bot, source, message, event, args):
         if message and len(message) > 0:
@@ -575,7 +673,7 @@ class Dispatch:
                         break
 
             if not command:
-                bot.whisper(source.username, 'Volcania No command with found with the given parameters.')
+                bot.whisper(source.username, 'No command with found with the given parameters.')
                 return False
 
             data = collections.OrderedDict()
@@ -594,7 +692,7 @@ class Dispatch:
 
             bot.whisper(source.username, ', '.join(['%s=%s' % (key, value) for (key, value) in data.items()]))
         else:
-            bot.whisper(source.username, 'Volcania Usage: !debug command (COMMAND_ID|COMMAND_ALIAS)')
+            bot.whisper(source.username, 'Usage: !debug command (COMMAND_ID|COMMAND_ALIAS)')
 
     def debug_user(bot, source, message, event, args):
         if message and len(message) > 0:
@@ -603,7 +701,7 @@ class Dispatch:
 
             if user.id == -1:
                 del bot.users[username]
-                bot.whisper(source.username, 'Volcania No user with this username found.')
+                bot.whisper(source.username, 'No user with this username found.')
                 return False
 
             data = collections.OrderedDict()
@@ -616,7 +714,7 @@ class Dispatch:
 
             bot.whisper(source.username, ', '.join(['%s=%s' % (key, value) for (key, value) in data.items()]))
         else:
-            bot.whisper(source.username, 'Volcania Usage: !debug user USERNAME')
+            bot.whisper(source.username, 'Usage: !debug user USERNAME')
 
     def level(bot, source, message, event, args):
         if message:
@@ -625,7 +723,7 @@ class Dispatch:
                 username = msg_args[0].lower()
                 new_level = int(msg_args[1])
                 if new_level >= source.level:
-                    bot.whisper(source.username, 'Volcania You cannot promote someone to the same or higher level as you ({0}).'.format(source.level))
+                    bot.whisper(source.username, 'You cannot promote someone to the same or higher level as you ({0}).'.format(source.level))
                     return False
 
                 # We create the user if the user didn't already exist in the database.
@@ -633,11 +731,11 @@ class Dispatch:
 
                 user.level = new_level
 
-                bot.whisper(source.username, 'Volcania {0}\'s user level set to {1}'.format(username, new_level))
+                bot.whisper(source.username, '{0}\'s user level set to {1}'.format(username, new_level))
 
                 return True
 
-        bot.whisper(source.username, 'Volcania Usage: !level USERNAME NEW_LEVEL')
+        bot.whisper(source.username, 'Usage: !level USERNAME NEW_LEVEL')
         return False
 
     def say(bot, source, message, event, args):
@@ -658,7 +756,7 @@ class Dispatch:
         for user in bot.users.db_session.query(User).order_by(desc(User.num_lines))[:3]:
             users.append('{user.username_raw} ({user.num_lines})'.format(user=user))
 
-        bot.me('Volcania Top 3 lines: {0}'.format(', '.join(users)))
+        bot.me('Top 3 lines: {0}'.format(', '.join(users)))
 
     def top3_month(bot, source, message, event, args):
         """Prints out the top 3 chatters this month"""
@@ -666,7 +764,7 @@ class Dispatch:
         for user in bot.users.db_session.query(User).order_by(desc(User.num_lines_month))[:3]:
             users.append('{user.username_raw} ({user.num_lines_month})'.format(user=user))
 
-        bot.me('Volcania Top 3 lines this month: {0} PogChamp'.format(', '.join(users)))
+        bot.me('Top 3 lines this month: {0} PogChamp'.format(', '.join(users)))
    
     def ban(bot, source, message, event, args):
         if message:
@@ -687,32 +785,32 @@ class Dispatch:
 
             victim = bot.users.find(username)
             if victim is None:
-                bot.whisper(source.username, 'Volcania This user does not exist FailFish')
+                bot.whisper(source.username, 'This user does not exist FailFish')
                 return False
 
             """
             if victim == source:
-                bot.whisper(source.username, 'Volcania You can\'t timeout yourself FailFish')
+                bot.whisper(source.username, 'You can\'t timeout yourself FailFish')
                 return False
                 """
 
             if victim.level >= 500:
-                bot.whisper(source.username, 'Volcania This person has mod privileges, timeouting this person is not worth it.')
+                bot.whisper(source.username, 'This person has mod privileges, timeouting this person is not worth it.')
                 return False
 
             now = datetime.datetime.now()
             if victim.timed_out is True and victim.timeout_end > now:
                 victim.timeout_end += datetime.timedelta(seconds=_time)
-                bot.whisper(victim.username, 'Volcania {victim.username}, you were timed out for an additional {time} seconds by {source.username}'.format(
+                bot.whisper(victim.username, '{victim.username}, you were timed out for an additional {time} seconds by {source.username}'.format(
                     victim=victim,
                     source=source,
                     time=_time))
-                bot.whisper(source.username, 'Volcania You just used {0} points to time out {1} for an additional {2} seconds.'.format(args['command'].cost, username, _time))
+                bot.whisper(source.username, 'You just used {0} points to time out {1} for an additional {2} seconds.'.format(args['command'].cost, username, _time))
                 num_seconds = int((victim.timeout_end - now).total_seconds())
                 bot._timeout(username, num_seconds)
             else:
-                bot.whisper(source.username, 'Volcania You just used {0} points to time out {1} for {2} seconds.'.format(args['command'].cost, username, _time))
-                bot.whisper(username, 'Volcania {0} just timed you out for {1} seconds. /w {2} !$unbanme to unban yourself for points'.format(source.username, _time, bot.nickname))
+                bot.whisper(source.username, 'You just used {0} points to time out {1} for {2} seconds.'.format(args['command'].cost, username, _time))
+                bot.whisper(username, '{0} just timed you out for {1} seconds. /w {2} !$unbanme to unban yourself for points'.format(source.username, _time, bot.nickname))
                 bot._timeout(username, _time)
                 victim.timed_out = True
                 victim.timeout_start = now
@@ -726,7 +824,7 @@ class Dispatch:
     def set_game(bot, source, message, event, args):
         if message:
             bot.twitchapi.set_game(bot.streamer, message)
-            bot.say('Volcania {0} updated the game to "{1}"'.format(source.username_raw, message))
+            bot.say('{0} updated the game to "{1}"'.format(source.username_raw, message))
 
     def set_title(bot, source, message, event, args):
         if message:
@@ -736,7 +834,7 @@ class Dispatch:
     def ban_source(bot, source, message, event, args):
         if 'filter' in args and 'notify' in args:
             if args['notify'] == 1:
-                bot.whisper(source.username, 'Volcania You have been permanently banned because your message matched our "{0}"-filter.'.format(args['filter'].name))
+                bot.whisper(source.username, 'You have been permanently banned because your message matched our "{0}"-filter.'.format(args['filter'].name))
 
         log.debug('banning {0}'.format(source.username))
         bot.ban(source.username)
@@ -749,7 +847,7 @@ class Dispatch:
 
         if 'filter' in args and 'notify' in args:
             if args['notify'] == 1:
-                bot.whisper(source.username, 'Volcania You have been timed out for {0} seconds because your message matched our "{1}"-filter.'.format(_time, args['filter'].name))
+                bot.whisper(source.username, 'You have been timed out for {0} seconds because your message matched our "{1}"-filter.'.format(_time, args['filter'].name))
 
         log.debug(args)
 
@@ -771,15 +869,18 @@ class Dispatch:
         and its last use date should be set to now.
         Usage: !setdeck imgur.com/abcdefgh"""
 
+        log.warn('Dispatch set_deck is deprecated. Use the deck module.')
+        bot.whisper(source.username, 'This command has been deprecated. use !set deck instead (with a space)')
+
         if message:
             deck, new_deck = bot.decks.set_current_deck(message)
             if new_deck is True:
-                bot.whisper(source.username, 'Volcania This deck is a new deck. Its ID is {deck.id}'.format(deck=deck))
+                bot.whisper(source.username, 'This deck is a new deck. Its ID is {deck.id}'.format(deck=deck))
             else:
-                bot.whisper(source.username, 'Volcania Updated an already-existing deck. Its ID is {deck.id}'.format(deck=deck))
+                bot.whisper(source.username, 'Updated an already-existing deck. Its ID is {deck.id}'.format(deck=deck))
                 bot.decks.commit()
 
-            bot.say('Volcania Successfully updated the latest deck.')
+            bot.say('Successfully updated the latest deck.')
             return True
 
         return False
@@ -791,10 +892,12 @@ class Dispatch:
         Usage: !updatedeck --name Midrange Secret --class paladin
         """
 
+        log.warn('Dispatch update_deck is deprecated. Use the deck module.')
+
         if message:
             options, response = bot.decks.parse_update_arguments(message)
             if options is False:
-                bot.whisper(source.username, 'Volcania Invalid update deck command')
+                bot.whisper(source.username, 'Invalid update deck command')
                 return False
 
             if 'id' in options:
@@ -806,20 +909,20 @@ class Dispatch:
                 deck = bot.decks.current_deck
 
             if deck is None:
-                bot.whisper(source.username, 'Volcania No valid deck to update.')
+                bot.whisper(source.username, 'No valid deck to update.')
                 return False
 
             if len(options) == 0:
-                bot.whisper(source.username, 'Volcania You have given me nothing to update with the deck!')
+                bot.whisper(source.username, 'You have given me nothing to update with the deck!')
                 return False
 
             deck.set(**options)
             bot.decks.commit()
-            bot.whisper(source.username, 'Volcania Updated deck with ID {deck.id}. Updated {list}'.format(deck=deck, list=', '.join([key for key in options])))
+            bot.whisper(source.username, 'Updated deck with ID {deck.id}. Updated {list}'.format(deck=deck, list=', '.join([key for key in options])))
 
             return True
         else:
-            bot.whisper(source.username, 'Volcania Usage example: !updatedeck --name Midrange Secret --class paladin')
+            bot.whisper(source.username, 'Usage example: !updatedeck --name Midrange Secret --class paladin')
             return False
 
     def remove_deck(bot, source, message, event, args):
@@ -828,6 +931,8 @@ class Dispatch:
         OR
         !removedeck 123
         """
+
+        log.warn('Dispatch remove_deck is deprecated. Use the deck module.')
 
         if message:
             id = None
@@ -839,19 +944,19 @@ class Dispatch:
             deck = bot.decks.find(id=id, link=message)
 
             if deck is None:
-                bot.whisper(source.username, 'Volcania No deck matching your parameters found.')
+                bot.whisper(source.username, 'No deck matching your parameters found.')
                 return False
 
             try:
                 bot.decks.remove_deck(deck)
-                bot.whisper(source.username, 'Volcania Successfully removed the deck.')
+                bot.whisper(source.username, 'Successfully removed the deck.')
             except:
                 log.exception('An exception occured while attempting to remove the deck')
-                bot.whisper(source.username, 'Volcania An error occured while removing your deck.')
+                bot.whisper(source.username, 'An error occured while removing your deck.')
                 return False
             return True
         else:
-            bot.whisper(source.username, 'Volcania Usage example: !removedeck http://imgur.com/abc')
+            bot.whisper(source.username, 'Usage example: !removedeck http://imgur.com/abc')
             return False
 
     def welcome_sub(bot, source, message, event, args):
@@ -898,16 +1003,16 @@ class Dispatch:
             user = bot.users.find(tmp_username)
 
             if not user:
-                bot.whisper(source.username, 'Volcania No user with that name found.')
+                bot.whisper(source.username, 'No user with that name found.')
                 return False
 
             if user.ignored:
-                bot.whisper(source.username, 'Volcania User is already ignored.')
+                bot.whisper(source.username, 'User is already ignored.')
                 return False
 
             user.ignored = True
             message = message.lower()
-            bot.whisper(source.username, 'Volcania Now ignoring {0}'.format(user.username))
+            bot.whisper(source.username, 'Now ignoring {0}'.format(user.username))
 
     def unignore(bot, source, message, event, args):
         if message:
@@ -915,16 +1020,16 @@ class Dispatch:
             user = bot.users.find(tmp_username)
 
             if not user:
-                bot.whisper(source.username, 'Volcania No user with that name found.')
+                bot.whisper(source.username, 'No user with that name found.')
                 return False
 
             if user.ignored is False:
-                bot.whisper(source.username, 'Volcania User is not ignored.')
+                bot.whisper(source.username, 'User is not ignored.')
                 return False
 
             user.ignored = False
             message = message.lower()
-            bot.whisper(source.username, 'Volcania No longer ignoring {0}'.format(user.username))
+            bot.whisper(source.username, 'No longer ignoring {0}'.format(user.username))
 
     def permaban(bot, source, message, event, args):
         if message:
@@ -932,16 +1037,16 @@ class Dispatch:
             user = bot.users.find(tmp_username)
 
             if not user:
-                bot.whisper(source.username, 'Volcania No user with that name found.')
+                bot.whisper(source.username, 'No user with that name found.')
                 return False
 
             if user.banned:
-                bot.whisper(source.username, 'Volcania User is already permabanned.')
+                bot.whisper(source.username, 'User is already permabanned.')
                 return False
 
             user.banned = True
             message = message.lower()
-            bot.whisper(source.username, 'Volcania {0} has now been permabanned.'.format(user.username))
+            bot.whisper(source.username, '{0} has now been permabanned.'.format(user.username))
 
     def unpermaban(bot, source, message, event, args):
         if message:
@@ -949,16 +1054,16 @@ class Dispatch:
             user = bot.users.find(tmp_username)
 
             if not user:
-                bot.whisper(source.username, 'Volcania No user with that name found.')
+                bot.whisper(source.username, 'No user with that name found.')
                 return False
 
             if user.banned is False:
-                bot.whisper(source.username, 'Volcania User is not permabanned.')
+                bot.whisper(source.username, 'User is not permabanned.')
                 return False
 
             user.banned = False
             message = message.lower()
-            bot.whisper(source.username, 'Volcania {0} is no longer permabanned'.format(user.username))
+            bot.whisper(source.username, '{0} is no longer permabanned'.format(user.username))
 
     def tweet(bot, source, message, event, args):
         if message and len(message) > 1:
@@ -986,11 +1091,11 @@ class Dispatch:
 
         if user:
             if user.subscriber:
-                bot.say('Volcania {0} is a subscriber PogChamp'.format(user.username))
+                bot.say('{0} is a subscriber PogChamp'.format(user.username))
             else:
-                bot.say('Volcania {0} is not a subscriber FeelsBadMan'.format(user.username))
+                bot.say('{0} is not a subscriber FeelsBadMan'.format(user.username))
         else:
-            bot.say('Volcania {0} was not found in the user database'.format(username))
+            bot.say('{0} was not found in the user database'.format(username))
 
     def check_mod(bot, source, message, event, args):
         if message:
@@ -1001,11 +1106,11 @@ class Dispatch:
 
         if user:
             if user.moderator:
-                bot.say('Volcania {0} is a moderator PogChamp'.format(user.username))
+                bot.say('{0} is a moderator PogChamp'.format(user.username))
             else:
-                bot.say('Volcania {0} is not a moderator FeelsBadMan (or has not typed in chat)'.format(user.username))
+                bot.say('{0} is not a moderator FeelsBadMan (or has not typed in chat)'.format(user.username))
         else:
-            bot.say('Volcania {0} was not found in the user database'.format(username))
+            bot.say('{0} was not found in the user database'.format(username))
 
     def last_seen(bot, source, message, event, args):
         if message:
@@ -1013,9 +1118,9 @@ class Dispatch:
 
             user = bot.users.find(username)
             if user:
-                bot.say('Volcania {0}, {1} was last seen {2}, last active {3}'.format(source.username_raw, user.username, user.last_seen, user.last_active))
+                bot.say('{0}, {1} was last seen {2}, last active {3}'.format(source.username_raw, user.username, user.last_seen, user.last_active))
             else:
-                bot.say('Volcania {0}, No user with that name found.'.format(source.username_raw))
+                bot.say('{0}, No user with that name found.'.format(source.username_raw))
 
     def points(bot, source, message, event, args):
         if message:
@@ -1026,9 +1131,9 @@ class Dispatch:
 
         if user:
             if user == source:
-                bot.say('Volcania {0}, you have {1} points.'.format(source.username, user.points))
+                bot.say('{0}, you have {1} points.'.format(source.username, user.points))
             else:
-                bot.say('Volcania {0}, {1} has {2} points.'.format(source.username, user.username, user.points))
+                bot.say('{0}, {1} has {2} points.'.format(source.username, user.username, user.points))
         else:
             return False
 
@@ -1042,7 +1147,7 @@ class Dispatch:
             return False
 
         delay = int(parts[0])
-        extra_message = 'Volcania {0} {1}'.format(source.username, ' '.join(parts[1:]).strip())
+        extra_message = '{0} {1}'.format(source.username, ' '.join(parts[1:]).strip())
 
         bot.execute_delayed(delay, bot.say, (extra_message, ))
 
@@ -1059,31 +1164,35 @@ class Dispatch:
     def unban_source(bot, source, message, event, args):
         """Unban the user who ran the command."""
         bot.privmsg('.unban {0}'.format(source.username))
-        bot.whisper(source.username, 'Volcania You have been unbanned.')
+        bot.whisper(source.username, 'You have been unbanned.')
         source.timed_out = False
 
     def untimeout_source(bot, source, message, event, args):
         """Untimeout the user who ran the command.
         This is like unban except it will only remove timeouts, not permanent bans."""
         bot.privmsg('.timeout {0} 1'.format(source.username))
-        bot.whisper(source.username, 'Volcania You have been unbanned.')
+        bot.whisper(source.username, 'You have been unbanned.')
         source.timed_out = False
 
     def twitter_follow(bot, source, message, event, args):
         if message:
             username = message.split(' ')[0].strip().lower()
             if bot.twitter_manager.follow_user(username):
-                bot.whisper(source.username, 'Volcania Now following {}'.format(username))
+                bot.whisper(source.username, 'Now following {}'.format(username))
             else:
-                bot.whisper(source.username, 'Volcania An error occured while attempting to follow {}, perhaps we are already following this person?'.format(username))
+                bot.whisper(source.username, 'An error occured while attempting to follow {}, perhaps we are already following this person?'.format(username))
 
     def twitter_unfollow(bot, source, message, event, args):
         if message:
             username = message.split(' ')[0].strip().lower()
             if bot.twitter_manager.unfollow_user(username):
-                bot.whisper('Volcania No longer following {}'.format(username))
+<<<<<<< HEAD
+                bot.whisper('No longer following {}'.format(username))
+=======
+                bot.whisper(source.username, 'No longer following {}'.format(username))
+>>>>>>> upstream/master
             else:
-                bot.whisper(source.username, 'Volcania An error occured while attempting to unfollow {}, perhaps we are not following this person?'.format(username))
+                bot.whisper(source.username, 'An error occured while attempting to unfollow {}, perhaps we are not following this person?'.format(username))
 
     def reload(bot, source, message, event, args):
         if message and message in bot.reloadable:
@@ -1110,7 +1219,7 @@ class Dispatch:
         options, description = bot.stream_manager.parse_highlight_arguments(message)
 
         if options is False:
-            bot.whisper(source.username, 'Volcania Invalid highlight arguments.')
+            bot.whisper(source.username, 'Invalid highlight arguments.')
             return False
 
         if len(description) > 0:
@@ -1123,18 +1232,18 @@ class Dispatch:
                 res = bot.stream_manager.update_highlight(id, **options)
 
                 if res is True:
-                    bot.whisper(source.username, 'Volcania Successfully updated your highlight ({0})'.format(', '.join([key for key in options])))
+                    bot.whisper(source.username, 'Successfully updated your highlight ({0})'.format(', '.join([key for key in options])))
                 else:
-                    bot.whisper(source.username, 'Volcania A highlight with this ID does not exist.')
+                    bot.whisper(source.username, 'A highlight with this ID does not exist.')
             else:
-                bot.whisper(source.username, 'Volcania Nothing to update! Give me some arguments')
+                bot.whisper(source.username, 'Nothing to update! Give me some arguments')
         else:
             res = bot.stream_manager.create_highlight(**options)
 
             if res is True:
-                bot.whisper(source.username, 'Volcania Successfully created your highlight')
+                bot.whisper(source.username, 'Successfully created your highlight')
             else:
-                bot.whisper(source.username, 'Volcania An error occured while adding your highlight: {0}'.format(res))
+                bot.whisper(source.username, 'An error occured while adding your highlight: {0}'.format(res))
 
             log.info('Create a highlight at the current timestamp!')
 
@@ -1144,22 +1253,24 @@ class Dispatch:
         """
 
         if message is None:
-            bot.whisper(source.username, 'Volcania Usage: !remove highlight ID')
+            bot.whisper(source.username, 'Usage: !remove highlight ID')
             return False
 
         try:
             id = int(message.split()[0])
         except ValueError:
-            bot.whisper(source.username, 'Volcania Usage: !remove highlight ID')
+            bot.whisper(source.username, 'Usage: !remove highlight ID')
             return False
 
         res = bot.stream_manager.remove_highlight(id)
         if res is True:
-            bot.whisper(source.username, 'Volcania Successfully removed highlight with ID {}.'.format(id))
+            bot.whisper(source.username, 'Successfully removed highlight with ID {}.'.format(id))
         else:
-            bot.whisper(source.username, 'Volcania No highlight with the ID {} found.'.format(id))
+            bot.whisper(source.username, 'No highlight with the ID {} found.'.format(id))
 
     def follow_age(bot, source, message, event, args):
+        log.warn('Dispatch follow_age is deprecated. Use the followage module.')
+
         username = source.username
         streamer = None
         if message is not None and len(message) > 0:
@@ -1173,9 +1284,33 @@ class Dispatch:
 
         bot.action_queue.add(check_follow_age, args=[bot, source, username, streamer])
 
+    def turbo_raffle(bot, source, message, event, args):
+        if hasattr(Dispatch, 'raffle_running') and Dispatch.raffle_running is True:
+            bot.say('{0}, a raffle is already running OMGScoots'.format(source.username_raw))
+            return False
+
+        Dispatch.raffle_users = []
+        Dispatch.raffle_running = True
+        Dispatch.raffle_points = 100
+
+        try:
+            if message is not None:
+                Dispatch.raffle_points = int(message.split()[0])
+        except ValueError:
+            pass
+
+        bot.websocket_manager.emit('notification', {'message': 'A turbo raffle has been started!'})
+        bot.execute_delayed(0.75, bot.websocket_manager.emit, ('notification', {'message': 'Type !join to enter!'}))
+
+        bot.me('A turbo raffle has begun for {} points. type !join to join the raffle! The raffle will end in 30 seconds'.format(Dispatch.raffle_points))
+        bot.execute_delayed(10, bot.me, ('The raffle for {} points ends in 20 seconds! Type !join to join the raffle!'.format(Dispatch.raffle_points), ))
+        bot.execute_delayed(20, bot.me, ('The raffle for {} points ends in 10 seconds! Type !join to join the raffle!'.format(Dispatch.raffle_points), ))
+
+        bot.execute_delayed(30, Dispatch.end_raffle, (bot, source, message, event, args))
+
     def raffle(bot, source, message, event, args):
         if hasattr(Dispatch, 'raffle_running') and Dispatch.raffle_running is True:
-            bot.say('Volcania {0}, a raffle is already running OMGScoots'.format(source.username_raw))
+            bot.say('{0}, a raffle is already running OMGScoots'.format(source.username_raw))
             return False
 
         Dispatch.raffle_users = []
@@ -1191,10 +1326,10 @@ class Dispatch:
         bot.websocket_manager.emit('notification', {'message': 'A raffle has been started!'})
         bot.execute_delayed(0.75, bot.websocket_manager.emit, ('notification', {'message': 'Type !join to enter!'}))
 
-        bot.me('Volcania A raffle has begun for {} points. type !join to join the raffle! The raffle will end in 60 seconds'.format(Dispatch.raffle_points))
-        bot.execute_delayed(15, bot.me, ('Volcania The raffle for {} points ends in 45 seconds! Type !join to join the raffle!'.format(Dispatch.raffle_points), ))
-        bot.execute_delayed(30, bot.me, ('Volcania The raffle for {} points ends in 30 seconds! Type !join to join the raffle!'.format(Dispatch.raffle_points), ))
-        bot.execute_delayed(45, bot.me, ('Volcania The raffle for {} points ends in 15 seconds! Type !join to join the raffle!'.format(Dispatch.raffle_points), ))
+        bot.me('A raffle has begun for {} points. type !join to join the raffle! The raffle will end in 60 seconds'.format(Dispatch.raffle_points))
+        bot.execute_delayed(15, bot.me, ('The raffle for {} points ends in 45 seconds! Type !join to join the raffle!'.format(Dispatch.raffle_points), ))
+        bot.execute_delayed(30, bot.me, ('The raffle for {} points ends in 30 seconds! Type !join to join the raffle!'.format(Dispatch.raffle_points), ))
+        bot.execute_delayed(45, bot.me, ('The raffle for {} points ends in 15 seconds! Type !join to join the raffle!'.format(Dispatch.raffle_points), ))
 
         bot.execute_delayed(60, Dispatch.end_raffle, (bot, source, message, event, args))
 
@@ -1205,7 +1340,7 @@ class Dispatch:
         Dispatch.raffle_running = False
 
         if len(Dispatch.raffle_users) == 0:
-            bot.me('Volcania Wow, no one joined the raffle DansGame')
+            bot.me('Wow, no one joined the raffle DansGame')
             return False
 
         winner = random.choice(Dispatch.raffle_users)
@@ -1213,7 +1348,7 @@ class Dispatch:
         Dispatch.raffle_users = []
 
         bot.websocket_manager.emit('notification', {'message': '{} won {} points in the raffle!'.format(winner.username_raw, Dispatch.raffle_points)})
-        bot.me('Volcania The raffle has finished! {0} won {1} points! PogChamp'.format(winner.username_raw, Dispatch.raffle_points))
+        bot.me('The raffle has finished! {0} won {1} points! PogChamp'.format(winner.username_raw, Dispatch.raffle_points))
 
         winner.points += Dispatch.raffle_points
 

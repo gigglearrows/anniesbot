@@ -21,11 +21,12 @@ from pajbot.models.deck import Deck
 from pajbot.models.command import CommandExample
 from pajbot.models.user import User
 from pajbot.models.duel import UserDuelStats
-from pajbot.models.stream import Stream, StreamChunkHighlight
+from pajbot.models.stream import Stream, StreamChunk, StreamChunkHighlight
 from pajbot.models.webcontent import WebContent
 from pajbot.models.time import TimeManager
 from pajbot.models.pleblist import PleblistSong
 from pajbot.models.sock import SocketClientManager
+from pajbot.models.module import ModuleManager
 from pajbot.apiwrappers import TwitchAPI
 from pajbot.tbutil import time_since
 from pajbot.tbutil import find
@@ -129,12 +130,9 @@ DBManager.init(config['main']['db'])
 TimeManager.init_timezone(config['main'].get('timezone', 'UTC'))
 
 with DBManager.create_session_scope() as db_session:
-    num_decks = db_session.query(func.count(Deck.id)).scalar()
     custom_web_content = {}
     for web_content in db_session.query(WebContent).filter(WebContent.content is not None):
         custom_web_content[web_content.page] = web_content.content
-
-has_decks = num_decks > 0
 
 errors.init(app)
 api.config = config
@@ -162,7 +160,6 @@ def nocache(view):
 def update_commands(signal_id):
     global bot_commands_list
     from pajbot.models.command import CommandManager
-    from pajbot.models.module import ModuleManager
     bot_commands = CommandManager(
             socket_manager=None,
             module_manager=ModuleManager(None).load(),
@@ -511,12 +508,14 @@ def pleblist_history_stream(stream_id):
         total_length_left = sum([song.song_info.duration if song.date_played is None and song.song_info is not None else 0 for song in songs])
 
         first_unplayed_song = find(lambda song: song.date_played is None, songs)
+        stream_chunks = session.query(StreamChunk).filter(StreamChunk.stream_id == stream.id).all()
 
         return render_template('pleblist_history.html',
                 stream=stream,
                 songs=songs,
                 total_length_left=total_length_left,
-                first_unplayed_song=first_unplayed_song)
+                first_unplayed_song=first_unplayed_song,
+                stream_chunks=stream_chunks)
 
 
 @app.route('/discord')
@@ -632,13 +631,15 @@ def number_format(value, tsep=',', dsep='.'):
 
     return lhs + splt[:-1] + rhs
 
+module_manager = ModuleManager(None).load()
 
 nav_bar_header = []
 nav_bar_header.append(('/', 'home', 'Home'))
 nav_bar_header.append(('/commands/', 'commands', 'Commands'))
-if has_decks:
+if 'deck' in module_manager:
     nav_bar_header.append(('/decks/', 'decks', 'Decks'))
-nav_bar_header.append(('/points/', 'points', 'Points'))
+if config['main']['nickname'] not in ['scamazbot']:
+    nav_bar_header.append(('/points/', 'points', 'Points'))
 nav_bar_header.append(('/stats/', 'stats', 'Stats'))
 nav_bar_header.append(('/highlights/', 'highlights', 'Highlights'))
 if 'pleblist' in modules:
@@ -656,6 +657,8 @@ nav_bar_admin_header.append(('/admin/commands/', 'admin_commands', 'Commands'))
 nav_bar_admin_header.append(('/admin/timers/', 'admin_timers', 'Timers'))
 nav_bar_admin_header.append(('/admin/moderators/', 'admin_moderators', 'Moderators'))
 nav_bar_admin_header.append(('/admin/modules/', 'admin_modules', 'Modules'))
+if 'predict' in module_manager:
+    nav_bar_admin_header.append(('/admin/predictions/', 'admin_predictions', 'Predictions'))
 
 version = Bot.version
 last_commit = ''
@@ -689,7 +692,6 @@ default_variables = {
             'name': config['web']['streamer_name'],
             'full_name': config['main']['streamer']
             },
-        'has_decks': has_decks,
         'nav_bar_header': nav_bar_header,
         'nav_bar_admin_header': nav_bar_admin_header,
         'modules': modules,
@@ -721,6 +723,14 @@ def time_diff(t1, t2, format='long'):
 def time_ago_timespan_seconds(t, format='long'):
     v = time_since(t, 0, format)
     return 'None' if len(v) == 0 else v
+
+@app.template_filter('seconds_to_vodtime')
+def seconds_to_vodtime(t):
+    s = int(t)
+    h = s / 3600
+    m = s % 3600 / 60
+    s = s % 60
+    return '%dh%02dm%02ds' % (h, m, s)
 
 if __name__ == '__main__':
     app.run(debug=args.debug, host=args.host, port=args.port)

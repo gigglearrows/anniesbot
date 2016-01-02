@@ -530,30 +530,6 @@ class CommandManager(UserDict):
                                 chat='user:!add command test Kappa 123 --whisper\n'
                                 'bot>user:Added your command (ID: 7)',
                                 description='This creates a command with the trigger !test which responds with Kappa 123 as a whisper to the user who called the command').parse(),
-                            CommandExample(None, 'Change the Global Cooldown',
-                                chat='user:!add command test --cd 10\n'
-                                'bot>user:Updated the command (ID: 29)',
-                                description='Changes the global cooldown for the command !test to 10 seconds').parse(),
-                            CommandExample(None, 'Change the User-specific Cooldown',
-                                chat='user:!add command test --usercd 30\n'
-                                'bot>user:Updated the command (ID: 29)',
-                                description='Changes the user-specific cooldown for the command !test to 30 seconds').parse(),
-                            CommandExample(None, 'Change the Level for a command',
-                                chat='user:!add command test --level 500\n'
-                                'bot>user:Updated the command (ID: 29)',
-                                description='Changes the command level for !test to level 500').parse(),
-                            CommandExample(None, 'Change the Cost for a command',
-                                chat='user:!add command $test1 --cost 50\n'
-                                'bot>user:Updated the command (ID: 27)',
-                                description='Changes the command cost for !$test1 to 50 points, you should always use a $ for a command that cost points.').parse(),
-                            CommandExample(None, 'Change a command to Moderator only',
-                                chat='user:!add command test --modonly\n'
-                                'bot>user:Updated the command (ID: 29)',
-                                description='This command can only be used for user with level 100 and Moderator status or user over level 500').parse(),
-                            CommandExample(None, 'Remove Moderator only from a command',
-                                chat='user:!add command test --no-modonly\n'
-                                'bot>user:Updated the command (ID: 29)',
-                                description='This command can be used for normal users again.').parse(),
                             ]),
                     'banphrase': Command.dispatch_command('add_banphrase',
                         level=500,
@@ -657,7 +633,50 @@ class CommandManager(UserDict):
                             ]),
 
                     })
-        self.internal_commands['edit'] = self.internal_commands['add']
+        self.internal_commands['edit'] = Command.multiaction_command(
+                level=100,
+                delay_all=0,
+                delay_user=0,
+                default=None,
+                command='add',
+                commands={
+                    'command': Command.dispatch_command('edit_command',
+                        level=500,
+                        description='Edit an already-existing command',
+                        examples=[
+                            CommandExample(None, 'Change the response',
+                                chat='user:!edit command test This is the new response!\n'
+                                'bot>user:Updated the command (ID: 29)',
+                                description='Changes the text response for the command !test to "This is the new response!"').parse(),
+                            CommandExample(None, 'Change the Global Cooldown',
+                                chat='user:!edit command test --cd 10\n'
+                                'bot>user:Updated the command (ID: 29)',
+                                description='Changes the global cooldown for the command !test to 10 seconds').parse(),
+                            CommandExample(None, 'Change the User-specific Cooldown',
+                                chat='user:!edit command test --usercd 30\n'
+                                'bot>user:Updated the command (ID: 29)',
+                                description='Changes the user-specific cooldown for the command !test to 30 seconds').parse(),
+                            CommandExample(None, 'Change the Level for a command',
+                                chat='user:!edit command test --level 500\n'
+                                'bot>user:Updated the command (ID: 29)',
+                                description='Changes the command level for !test to level 500').parse(),
+                            CommandExample(None, 'Change the Cost for a command',
+                                chat='user:!edit command $test1 --cost 50\n'
+                                'bot>user:Updated the command (ID: 27)',
+                                description='Changes the command cost for !$test1 to 50 points, you should always use a $ for a command that cost points.').parse(),
+                            CommandExample(None, 'Change a command to Moderator only',
+                                chat='user:!edit command test --modonly\n'
+                                'bot>user:Updated the command (ID: 29)',
+                                description='This command can only be used for user with level 100 and Moderator status or user over level 500').parse(),
+                            CommandExample(None, 'Remove Moderator only from a command',
+                                chat='user:!edit command test --no-modonly\n'
+                                'bot>user:Updated the command (ID: 29)',
+                                description='This command can be used for normal users again.').parse(),
+                            ]),
+                    'funccommand': Command.dispatch_command('edit_funccommand',
+                        level=2000,
+                        description='Add a command that uses a command'),
+                    })
         self.internal_commands['remove'] = Command.multiaction_command(
                 level=100,
                 delay_all=0,
@@ -739,19 +758,6 @@ class CommandManager(UserDict):
                                 'bot>user:Successfully removed highlight with ID 2.',
                                 description='Removes the highlight ID 2').parse(),
                             ]),
-                    'deck': Command.dispatch_command('remove_deck',
-                        level=420,
-                        description='Removes a deck with the given ID.',
-                        examples=[
-                            CommandExample(None, 'Remove a deck by ID',
-                                chat='user:!remove deck 123\n'
-                                'bot>user:Successfully removed the deck.',
-                                description='The ID in this case is 123').parse(),
-                            CommandExample(None, 'Remove a deck by URL',
-                                chat='user:!remove deck http://i.imgur.com/rInqJv0.png\n'
-                                'bot>user:Successfully removed the deck.',
-                                description='The URL in this case is http://i.imgur.com/rInqJv0.png').parse(),
-                            ]),
                     })
         self.internal_commands['rem'] = self.internal_commands['remove']
         self.internal_commands['del'] = self.internal_commands['remove']
@@ -776,28 +782,7 @@ class CommandManager(UserDict):
                 level=2000,
                 description='Run a raw python command. Debug mode only')
 
-        self.internal_commands['set'] = Command.multiaction_command(
-                level=100,
-                delay_all=0,
-                delay_user=0,
-                default=None,
-                command='set',
-                commands={
-                    'deck': Command.dispatch_command('set_deck',
-                        level=420,
-                        description='Sets the deck that is currently playing.',
-                        examples=[
-                            CommandExample(None, 'Add a new deck',
-                                chat='user:!set deck http://i.imgur.com/rInqJv0.png\n'
-                                'bot>user:This deck is a new deck. Its ID is 32',
-                                description='This is the output if you set a deck which hasn\'t been set before.').parse(),
-                            CommandExample(None, 'Set a pre-existing deck',
-                                chat='user:!set deck http://i.imgur.com/rInqJv0.png\n'
-                                'bot>user:Updated an already-existing deck. Its ID is 32',
-                                description='This is the output if you set a deck which was added previously.').parse(),
-                            ]),
-                    })
-        #Declare rafflecommands
+        ##################### Declare rafflecommands ###############
         raffle_enable_command = Command.dispatch_command('raffle_enable',
             level=500,
             description='Enable the custom word raffle')
@@ -933,45 +918,15 @@ class CommandManager(UserDict):
                     'list': queue_list_command,
                     'show': queue_list_command,
                     })
-
-        self.internal_commands['update'] = Command.multiaction_command(
-                level=100,
-                delay_all=0,
-                delay_user=0,
-                default=None,
-                command='update',
-                commands={
-                    'deck': Command.dispatch_command('update_deck',
-                        level=420,
-                        description='Updates an already-existing deck.',
-                        examples=[
-                            CommandExample(None, 'Set the name and class of the current deck',
-                                chat='user:!update deck --name Midrange Secret --class paladin\n'
-                                'bot>user:Updated deck with ID 32. Updated name, class').parse(),
-                            CommandExample(None, 'Updates the link of the current deck',
-                                chat='user:!update deck --link http://i.imgur.com/QEVwrVV.png\n'
-                                'bot>user:Updated deck with ID 32. Updated link',
-                                description='Changes the link of the current deck. This could be used if you want to reupload the screenshot to imgur or something.').parse(),
-                            CommandExample(None, 'Set the name and class of an old deck',
-                                chat='user:!update deck --id 12 --name Aggro --class hunter\n'
-                                'bot>user:Updated deck with ID 12. Updated name, class',
-                                description='Updates the name and class of an old deck. Useful for whenever you need to clean up old decks.').parse(),
-                            ]),
-                    })
+        ############################################
 
         return self.internal_commands
 
     def create_command(self, alias_str, **options):
-        """
-        TODO: Does this part of the code work as expected?
-        Right now if the second alias is already used, it could result in us
-        creating a command with an alias that's already in use.
-        """
         aliases = alias_str.lower().replace('!', '').split('|')
-        main_alias = aliases[0]
-        if main_alias in self.data:
-            # Command with this alias already exists, return its instance!
-            return self.data[main_alias], False
+        for alias in aliases:
+            if alias in self.data:
+                return self.data[alias], False, alias
 
         command = Command(command=alias_str, **options)
         command.data = CommandData(command.id)
@@ -986,7 +941,7 @@ class CommandManager(UserDict):
         self.commit()
 
         self.rebuild()
-        return command, True
+        return command, True, ''
 
     def edit_command(self, command, **options):
         command.set(**options)
@@ -1007,6 +962,8 @@ class CommandManager(UserDict):
             self.db_session.expunge(command.data)
             db_session.delete(command.data)
             db_session.delete(command)
+
+        self.rebuild()
 
     def add_db_command_aliases(self, command):
         aliases = command.command.split('|')
@@ -1047,14 +1004,32 @@ class CommandManager(UserDict):
 
         """
 
+        def merge_commands(in_dict, out):
+            for alias, command in in_dict.items():
+                if command.action:
+                    # Resets any previous modifications to the action.
+                    # Right now, the only thing this resets is the MultiAction
+                    # command list.
+                    command.action.reset()
+
+                if alias in out:
+                    if (command.action and command.action.type == 'multi' and
+                            out[alias].action and out[alias].action.type == 'multi'):
+                        out[alias].action += command.action
+                    else:
+                        out[alias] = command
+                else:
+                    out[alias] = command
+
         self.data = {}
-        self.data.update(self.internal_commands)
-        self.data.update({alias: command for alias, command in self.db_commands.items() if command.enabled is True})
+        db_commands = {alias: command for alias, command in self.db_commands.items() if command.enabled is True}
+
+        merge_commands(self.internal_commands, self.data)
+        merge_commands(db_commands, self.data)
 
         if self.module_manager is not None:
             for enabled_module in self.module_manager.modules:
-                log.info('Checking module: {}'.format(enabled_module.commands))
-                self.data.update(enabled_module.commands)
+                merge_commands(enabled_module.commands, self.data)
 
     def load(self, **options):
         self.load_internal_commands(**options)
