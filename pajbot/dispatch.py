@@ -72,16 +72,12 @@ class Dispatch:
             bot.say(bot.phrases['nl_0'].format(**phrase_data))
    
     def clear_lines_month(bot, source, message, event, args):
-        #EDIT THIS SHITCURSOR
-        #cursor = bot.get_dictcursor()
-        #cursor.execute('UPDATE `tb_user` SET `num_lines_month`=0')
         bot.users.db_session.query(User).update({User.num_lines_month: 0}) 
              
         #for username, user in bot.users.items():
         #   user.num_lines_month = 0
         #    user.needs_sync = True
         log.info('Successfully cleared num_lines_month for this month')
-      #  cursor.close()
 
     def point_pos(bot, source, message, event, args):
         user = None
@@ -155,14 +151,8 @@ class Dispatch:
         if num_lines_month <= 0:
             bot.me('Volcania {0} has not written anything in this channel this month ... BibleThump'.format(username))
         else:
-            #Check this CURSORSHIT
             query_data = bot.users.db_session.query(func.count(User.id)).filter(User.num_lines_month > num_lines_month).one()
             
-            #cursor = bot.get_dictcursor()
-            #cursor.execute('SELECT COUNT(*) as `pos` FROM `tb_user` WHERE `num_lines_month`>%s', (num_lines_month, ))
-            #row = cursor.fetchone()
-            #if row:
-            #phrase_data['nl_pos_month'] = int(query_data[0]) + 1
             bot.me('Volcania {0} is rank # {1} on this months lines leaderboard! 4Head'.format(username, int(query_data[0] + 1)))
 
    
@@ -882,7 +872,7 @@ class Dispatch:
 
     def resub(bot, source, message, event, args):
         match = args['match']
-        num_lines = tyggbot.users[match.group(1)].num_lines
+        num_lines = bot.users[match.group(1)].num_lines
         phrase_data = {
                 'username': match.group(1),
                 'num_months': match.group(2),
@@ -1178,7 +1168,7 @@ class Dispatch:
             if potential_user is not None:
                 username = potential_user.username
 
-           if len(message_split) > 1 and message_split[1].replace('_', '').isalnum():
+            if len(message_split) > 1 and message_split[1].replace('_', '').isalnum():
                 streamer = message_split[1]
 
         bot.action_queue.add(check_follow_age, args=[bot, source, username, streamer])

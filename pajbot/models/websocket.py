@@ -2,7 +2,7 @@ import json
 import logging
 import threading
 
-from tyggbot.dispatch import Dispatch
+from pajbot.dispatch import Dispatch
 log = logging.getLogger('pajbot')
 
 
@@ -30,7 +30,7 @@ class WebSocketServer:
                     log.info('Binary message received: {0} bytes'.format(len(payload)))
                 else:
                     log.info('Text message received: {0}'.format(payload.decode('utf8')))
-                from tyggbot.models.action import ActionParser
+                from pajbot.models.action import ActionParser
                 if payload.decode('utf8') == 'clear_lines_month':
                     try:
                         Dispatch.clear_lines_month(ActionParser.bot, None, None, None, None)
