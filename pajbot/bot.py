@@ -112,8 +112,11 @@ class Bot:
         self.password = config['main'].get('password', 'abcdef')
 
         self.timezone = config['main'].get('timezone', 'UTC')
+        self.schedule_hour = int(config['main'].get('schedule_hour','18')) #Giggleadd
 
         self.trusted_mods = config.getboolean('main', 'trusted_mods')
+        self.champ_emote = config['useremotes'].get('champ', 'PogChamp') #Giggleadd
+        self.thump_emote = config['useremotes'].get('thump', 'BibleThump') #Giggleadd
 
         TimeManager.init_timezone(self.timezone)
 

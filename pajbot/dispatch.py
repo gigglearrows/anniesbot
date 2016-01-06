@@ -1186,11 +1186,7 @@ class Dispatch:
         if message:
             username = message.split(' ')[0].strip().lower()
             if bot.twitter_manager.unfollow_user(username):
-<<<<<<< HEAD
-                bot.whisper('No longer following {}'.format(username))
-=======
                 bot.whisper(source.username, 'No longer following {}'.format(username))
->>>>>>> upstream/master
             else:
                 bot.whisper(source.username, 'An error occured while attempting to unfollow {}, perhaps we are not following this person?'.format(username))
 
