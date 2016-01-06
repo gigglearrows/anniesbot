@@ -522,6 +522,10 @@ def pleblist_history_stream(stream_id):
 def discord():
     return render_template('discord.html')
 
+@app.route('/test/')
+def test():
+    return render_template('test.html')
+
 
 @app.route('/clr/overlay/<widget_id>')
 @nocache
@@ -695,7 +699,6 @@ default_variables = {
         'nav_bar_header': nav_bar_header,
         'nav_bar_admin_header': nav_bar_admin_header,
         'modules': modules,
-        'current_time': datetime.datetime.now(),
         'request': request,
         'session': session,
         }
@@ -706,6 +709,11 @@ if 'streamtip' in config:
             'redirect_uri': config['streamtip']['redirect_uri'],
             }
 
+@app.context_processor
+def current_time():
+    current_time = {}
+    current_time['current_time'] = datetime.datetime.now()
+    return current_time
 
 @app.context_processor
 def inject_default_variables():
