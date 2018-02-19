@@ -13,29 +13,28 @@
     ('Whisperable', True, command.can_execute_with_whisper, 'can_execute_with_whisper', 'boolean', ''),
     ('Sub only', True, command.sub_only, 'sub_only', 'boolean', ''),
 ] %}
-<p>Columns in yellow mark an unsaved change.</p>
-<p>Click the "Save Changes" button below to confirm your changes.</p>
-<h2>Command</h2>
-<table class="ui definition table editcommand celled command">
+<h1 class="page-head-line">Command</h1>
+<h1 class="page-subhead-line"><i class="fa fa-paperclip fa-lg"></i> Columns in yellow mark an unsaved change.<br /><br /><i class="fa fa-paperclip fa-lg"></i> Click the "Save Changes" button below to confirm your changes.</h1>
+<table class="table table-responsive table-bordered definition editcommand command">
     <tbody>
         {% for label, editable, value, name, type, suffix in data_available %}
         {% if type == 'boolean' %}
         {% set value = 1 if value == True else 0 %}
         {% endif %}
         <tr data-originalvalue="{{ value }}" data-value="{{ value }}" data-name="{{ name }}" data-type="{{ type }}">
-            <td class="label two wide">{{ label }}</td>
-            <td class="buttons two wide right aligned">
+            <td class="col-xs-2" style="background-color:#e6e6e6;"><h5><strong>{{ label }}</strong></h5></td>
+            <td class="buttons col-xs-2 right aligned">
                 {% if editable %}
-                <div class="ui small compact basic icon buttons display">
-                    <button title="Edit value" class="ui button icon edit"><i class="icon edit"></i></button>
+                <div class="buttons display">
+                    <button title="Edit value" class="btn btn-default btn-sm edit"><i class="fa fa-pencil-square-o fa-lg"></i></button>
                 </div>
-                <div class="ui small compact basic icon buttons edit">
-                    <button title="Cancel changes" class="ui button icon cancel"><i class="icon red cancel"></i></button>
-                    <button title="Confirm changes" class="ui button icon save"><i class="icon green save"></i></button>
+                <div class="buttons edit">
+                    <button title="Cancel changes" class="btn btn-default btn-sm cancel"><i class="fa fa-times fa-lg color-red"></i></button>
+                    <button title="Confirm changes" class="btn btn-default btn-sm save"><i class="fa fa-floppy-o fa-lg color-green"></i></button>
                 </div>
                 {% endif %}
             </td>
-            <td class="value left aligned twelve wide">
+            <td class="value left aligned col-xs-8">
                 <div class="display" data-value="{{ value }}"><span class="value">
                     {% if type == 'boolean' %}
                         {{ 'Yes' if value == 1 else 'No' }}
@@ -43,17 +42,17 @@
                         {{ value }}
                     {% endif %}
                     </span>{{ suffix }}</div>
-                <div class="edit">
+                <div class="edit col-xs-4">
                     {% if type == 'boolean' %}
-                    <div class="ui checkbox">
+                    <div class="checkbox-inline">
                         <input id="cb-{{ name }}" type="checkbox" />
                         <label for="cb-{{ name }}">{{ 'Yes' if value == 1 else 'No' }}</label>
                     </div>
                     {% else %}
-                    <div class="ui compact input{{ ' right labeled' if suffix|length > 0 else '' }}">
-                        <input type="text" />
+                    <div class="input{{ ' input-group' if suffix|length > 0 else '' }}">
+                        <input class="form-control" type="text" />
                         {% if suffix|length > 0 %}
-                        <div class="ui basic label">{{ suffix }}</div>
+                        <span class="input-group-addon">{{ suffix }}</div>
                         {% endif %}
                     </div>
                     {% endif %}
@@ -78,7 +77,7 @@
 ] %}
 {% endif %}
 <h2>Action</h2>
-<table class="ui definition table editcommand celled action">
+<table class="table table-responsive table-bordered definition editcommand action">
     <tbody>
         {% for label, editable, value, name, type, suffix in data_available %}
         {% if type == 'boolean' %}
@@ -88,19 +87,19 @@
         {% set type = 'list' %}
         {% endif %}
         <tr data-originalvalue="{{ value }}" data-value="{{ value }}" data-name="{{ name }}" data-type="{{ type }}">
-            <td class="label two wide">{{ label }}</td>
-            <td class="buttons two wide right aligned">
+            <td class="col-xs-2" style="background-color:#e6e6e6;"><h5><strong>{{ label }}<strong></h5></td>
+            <td class="buttons col-xs-2 right aligned">
                 {% if editable %}
-                <div class="ui small compact basic icon buttons display">
-                    <button title="Edit value" class="ui button icon edit"><i class="icon edit"></i></button>
+                <div class="buttons display">
+                    <button title="Edit value" class="btn btn-default btn-sm edit"><i class="fa fa-pencil-square-o fa-lg"></i></button>
                 </div>
-                <div class="ui small compact basic icon buttons edit">
-                    <button title="Cancel changes" class="ui button icon cancel"><i class="icon red cancel"></i></button>
-                    <button title="Confirm changes" class="ui button icon save"><i class="icon green save"></i></button>
+                <div class="buttons edit">
+                    <button title="Cancel changes" class="btn btn-default btn-sm cancel"><i class="fa fa-times fa-lg color-red"></i></button>
+                    <button title="Confirm changes" class="btn btn-default btn-sm save"><i class="fa fa-floppy-o fa-lg color-green"></i></button>
                 </div>
                 {% endif %}
             </td>
-            <td class="value left aligned twelve wide">
+            <td class="value left aligned col-xs-8">
                 <div class="display" data-value="{{ value }}"><span class="value">
                     {% if type == 'boolean' %}
                         {{ 'Yes' if value == 1 else 'No' }}
@@ -110,25 +109,24 @@
                     </span>{{ suffix }}</div>
                 <div class="edit">
                     {% if type == 'boolean' %}
-                    <div class="ui checkbox">
-                        <input id="cb-{{ name }}" type="checkbox" />
+                    <div class="checkbox">
+                        <input id="cb-{{ name }}" type="checkbox" class="form-control" />
                         <label for="cb-{{ name }}">{{ 'Yes' if value == 1 else 'No' }}</label>
                     </div>
                     {% elif type == 'list' %}
-                    <div class="ui dropdown">
-                        <input type="hidden" name="{{ name }}" value="{{ value }}">
-                        <i class="dropdown icon"></i>
-                        <div class="default text">{{ value }}</div>
-                        <div class="menu">
+                    <div class="dropdown">
+                        <input type="hidden" class="form-control" name="{{ name }}" value="{{ value }}">
+                        <button class="btn dropdown-toggle" type="button" data-toggle="dropdown"><i class="fa fa-caret-down"></i> {{ value }}</button>                      
+                        <ul class="dropdown-menu">
                             {% for value in list_values %}
                             {% set key, label = value.split(':') %}
-                            <div class="item{{ ' active selected' if key == value else '' }}" data-value="{{ key }}">{{ label }}</div>
+                            <li class="{{ ' active selected' if key == value else '' }}" data-value="{{ key }}"><a href="#stay_here" name="stay_here">{{ label }}</a></li>
                             {% endfor %}
-                        </div>
+                        </ul>
                     </div>
                     {% else %}
                     <div class="ui compact input{{ ' right labeled' if suffix|length > 0 else '' }}{{ ' fluid' if type == 'string' else '' }}">
-                        <input type="text" />
+                        <input class="form-control" type="text" />
                         {% if suffix|length > 0 %}
                         <div class="ui basic label">{{ suffix }}</div>
                         {% endif %}
@@ -142,11 +140,11 @@
 </table>
 
 {% if user.level >= command.level %}
-<button class="ui disabled button large green icon save-changes"><i class="icon save"></i> <strong>Save Changes</strong></button>
+<button class="btn btn-success btn-lg disabled save-changes"><i class="fa fa-floppy-o"></i> <strong>Save Changes</strong></button>
 {% else %}
 <p>You cannot modify this command, because your level is too low.</p>
 {% endif %}
-<a href="/admin/commands/#c{{ command.id }}">Go to command</a>
+<a href="/admin/commands/#c{{ command.id }}"> <i class="fa fa-link"></i> Go to command</a>
 {% endblock %}
 {% block footer %}
 <script type="text/javascript">

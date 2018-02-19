@@ -2,44 +2,67 @@
 {% set active_page = 'stats' %}
 {% block title %}Stats{% endblock %}
 {% block body %}
-<h2>Stats</h2>
-{% if 'duels' in modules %}
-<p><a href="/stats/duels/"><i class="icon linkify"></i>  Duel stats</a></p>
-{% endif %}
-<div id="stats">
-    <h3>Top 5 Commands</h3>
-    <table class="ui very basic table">
-        <thead>
-            <tr>
-                <th>Command</th>
-                <th># Uses</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for command in top_5_commands %}
-                <tr>
-                    <td>{{ command.main_alias }}</td>
-                    <td>{{ command.data.num_uses|number_format }}</td>
-                </tr>
-            {% endfor %}
-    </table>
-    {% if 'linefarming' in modules %}
-        <h3>Top 5 Line Farmers</h3>
-        <table class="ui very basic table">
-            <thead>
-                <tr>
-                    <th>Username</th>
-                    <th>Lines</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for user in top_5_line_farmers %}
-                    <tr>
-                        <td>{% include 'user/username_link.html' %}</td>
-                        <td>{{ user.num_lines }}</td>
-                    </tr>
-                {% endfor %}
-        </table>
-    {% endif %}
+<div class="row">
+    <div class="col-md-12">
+        <h1 class="page-head-line">Stats</h1> 
+        <h1 class="page-subhead-line"><i class="fa fa-paperclip fa-lg"></i> Stats of commands used and lines farmed in the Twitch chat
+        <br /><br /><i class="fa fa-paperclip fa-lg"></i> Check out the Duel stats also!  <a href="/stats/duels/"><i class="fa fa-link"></i> Duel stats</a></h1>
+    </div>
 </div>
+<div class="row">
+    <div class="col-md-12">
+    <div id="stats">
+        <div class="panel panel-default" style="border: 0;">
+            <div class="panel-heading">
+                <h4><strong>Top 5 Commands</strong></h4>
+            </div>
+            <div class="panel-body">
+                    <table class="table table-responsive table-striped">
+                        <thead>
+                            <tr>
+                                <th>Command</th>
+                                <th># Uses</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for command in top_5_commands %}
+                                <tr>
+                                    <td>{{ command.main_alias }}</td>
+                                    <td>{{ command.data.num_uses|number_format }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+            </div>
+        </div>
+    
+{% if 'linefarming' in modules %}
+        <div class="panel panel-default" style="border: 0;">
+            <div class="panel-heading">
+                <h4><strong>Top 5 Line Farmers</strong></h4>
+            </div>
+            <div class="panel-body">
+                    <table class="table table-responsive table-striped">
+                        <thead>
+                            <tr>
+                                <th>Username</th>
+                                <th>Lines</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for user in top_5_line_farmers %}
+                                <tr>
+                                    <td>{% include 'user/username_link.html' %}</td>
+                                    <td>{{ user.num_lines }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    </div>
+</div>
+
 {% endblock %}

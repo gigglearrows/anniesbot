@@ -293,6 +293,7 @@ class Bot:
         self.arena_active = False
         self.aWins = 0
         self.aLoss = 0
+        self.deathcount = 0
 
         self.silent = True if args.silent else self.silent
 

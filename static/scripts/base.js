@@ -21,7 +21,7 @@ $(document).ready(function() {
             username: 'empty',
         },
         onSuccess: function(settings) {
-            document.location.href = '/user/'+$('#usersearch input.username').val();
+            document.location.href = '/user/'+$('#usersearch input.form-control.username').val();
             return false;
         }
     });

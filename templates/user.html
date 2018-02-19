@@ -2,135 +2,152 @@
 {% set active_page = 'stats' %}
 {% block title %}Profile - {{ user.username_raw}}{% endblock %}
 {% block body %}
-<div id="userprofile">
-    <h2>User Profile - {{ user.username_raw }}</h2>
-    <div class="mediumtable">
-        <table class="ui very basic table celled">
-            <tbody>
-                <tr>
-                    <td><strong>Username</strong></td>
-                    <td>{% include 'user/username_link.html' %}</td>
-                </tr>
-                <tr>
-                    <td><strong>ID</strong></td>
-                    <td>{{ user.id }}</td>
-                </tr>
-                <tr>
-                    <td><strong>Level</strong></td>
-                    <td>
-                        {% if user.level < 250 %}
-                        User
-                        {% elif user.level < 500 %}
-                        Dank Helper
-                        {% elif user.level < 1000 %}
-                        Moderator
-                        {% elif user.level < 1500 %}
-                        Super Moderator/Broadcaster
-                        {% elif user.level < 2500 %}
-                        Admin
-                        {% else %}
-                        ???
-                        {% endif %} ({{ user.level }})
-                    </td>
-                </tr>
-                <tr>
-                    <td><strong>Points</strong></td>
-                    <td>{{ user.points }} (Rank {{ user.rank }})</td>
-                </tr>
-                <tr>
-                    <td><strong>Messages sent</strong></td>
-                    <td>{{ user.num_lines }}</td>
-                </tr>
-                <tr>
-                    <td><strong>Last seen</strong></td>
-                    {% if user.last_seen %}
-                    <td>{{ user.last_seen|strftime('%Y-%m-%d %H:%M:%S') }}</td>
-                    {% else %}
-                    <td>Never</td>
-                    {% endif %}
-                </tr>
-
-                <tr>
-                    <td><strong>Last active in chat</strong></td>
-                    {% if user.last_active %}
-                    <td>{{ user.last_active|strftime('%Y-%m-%d %H:%M:%S') }}</td>
-                    {% else %}
-                    <td>Never</td>
-                    {% endif %}
-                </tr>
-                <tr>
-                    <td><strong>Time spent watching the stream</strong></td>
-                    <td>{{ (user.minutes_in_chat_online * 60)|time_ago_timespan_seconds }}</td>
-                </tr>
-                <tr>
-                    <td><strong>Time spent in offline chat</strong></td>
-                    {% if user.minutes_in_chat_offline > user.minutes_in_chat_online * 2 %}
-                    <td class="pemote">{{ (user.minutes_in_chat_offline * 60)|time_ago_timespan_seconds }} NotLikeThis</td>
-                    {% else %}
-                    <td>{{ (user.minutes_in_chat_offline * 60)|time_ago_timespan_seconds }}</td>
-                    {% endif %}
-                </tr>
-                <tr>
-                    <td><strong>Permabanned on {{ bot.name }}</strong></td>
-                    <td>{%if user.banned == 1 %}Yes{% else %}No{% endif %}</td>
-                </tr>
-            </tbody>
-        </table>
-
-        {% if user_duel_stats %}
-        <h3>Duel stats</h3>
-        <table class="ui very basic table celled">
-            <tbody>
-                <tr>
-                    <td><strong>Duels Total</strong></td>
-                    <td>{{ user_duel_stats.duels_total }}</td>
-                </tr>
-                <tr>
-                    <td><strong>Duels Won</strong></td>
-                    <td>{{ user_duel_stats.duels_won }}</td>
-                </tr>
-                <tr>
-                    <td><strong>Duels Lost</strong></td>
-                    <td>{{ user_duel_stats.duels_lost }}</td>
-                </tr>
-                <tr>
-                    <td><strong>Winrate</strong></td>
-                    <td>{{ user_duel_stats.winrate|round(2) }}%</td>
-                </tr>
-                <tr>
-                    <td><strong>Profit from duels</strong></td>
-                    <td>{{ user_duel_stats.profit }} points</td>
-                </tr>
-                <tr>
-                    <td><strong>Last duel</strong></td>
-                    <td>{{ user_duel_stats.last_duel|localize|strftime('%Y-%m-%d %H:%M:%S') }}</td>
-                </tr>
-                {% if user_duel_stats.longest_winstreak > 1 %}
-                <tr>
-                    <td><strong>Longest Win Streak</strong></td>
-                    <td>{{ user_duel_stats.longest_winstreak }}</td>
-                </tr>
-                {% endif %}
-                {% if user_duel_stats.longest_losestreak > 1 %}
-                <tr>
-                    <td><strong>Longest Lose Streak</strong></td>
-                    <td>{{ user_duel_stats.longest_losestreak }}</td>
-                </tr>
-                {% endif %}
-                {% if user_duel_stats.current_streak > 1 %}
-                <tr>
-                    <td><strong>Current Win Streak</strong></td>
-                    <td>{{ user_duel_stats.current_streak }}</td>
-                </tr>
-                {% elif user_duel_stats.current_streak < -1 %}
-                <tr>
-                    <td><strong>Current Lose Streak</strong></td>
-                    <td>{{ user_duel_stats.current_streak|abs }}</td>
-                </tr>
-                {% endif %}
-            </tbody>
-        </table>
+<div class="row">
+    <div class="col-md-12">
+        <h1 class="page-head-line">User Profile</h1> 
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+    <div id="userprofile">
+        <div class="panel panel-default" style="border: 0;">
+            <div class="panel-heading">
+                <h3><strong>{{ user.username_raw }}</strong></h3>
+            </div>
+            <div class="panel-body">
+                    <table class="table table-responsive borderless table-striped">
+                        <tbody>
+                            <tr>
+                                <td><strong>Username</strong></td>
+                                <td>{% include 'user/username_link.html' %}</td>
+                            </tr>
+                            <tr>
+                                    <td><strong>ID</strong></td>
+                                    <td>{{ user.id }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Level</strong></td>
+                                <td>
+                                    {% if user.level < 250 %}
+                                    User
+                                    {% elif user.level < 500 %}
+                                    Dank Helper
+                                    {% elif user.level < 1000 %}
+                                    Moderator
+                                    {% elif user.level < 1500 %}
+                                    Super Moderator/Broadcaster
+                                    {% elif user.level < 2500 %}
+                                    Admin
+                                    {% else %}
+                                    ???
+                                    {% endif %} ({{ user.level }})
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>Points</strong></td>
+                                <td>{{ user.points }} (Rank {{ user.rank }})</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Messages sent</strong></td>
+                                <td>{{ user.num_lines }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Last seen</strong></td>
+                                {% if user.last_seen %}
+                                <td>{{ user.last_seen|strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                                {% else %}
+                                <td>Never</td>
+                                {% endif %}
+                            </tr>
+                            <tr>
+                                <td><strong>Last active in chat</strong></td>
+                                {% if user.last_active %}
+                                <td>{{ user.last_active|strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                                {% else %}
+                                <td>Never</td>
+                                {% endif %}
+                            </tr>
+                            <tr>
+                                <td><strong>Time spent watching the stream</strong></td>
+                                <td>{{ (user.minutes_in_chat_online * 60)|time_ago_timespan_seconds }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Time spent in offline chat</strong></td>
+                                {% if user.minutes_in_chat_offline > user.minutes_in_chat_online * 2 %}
+                                <td class="pemote">{{ (user.minutes_in_chat_offline * 60)|time_ago_timespan_seconds }} NotLikeThis</td>
+                                {% else %}
+                                <td>{{ (user.minutes_in_chat_offline * 60)|time_ago_timespan_seconds }}</td>
+                                {% endif %}
+                            </tr>
+                            <tr>
+                                <td><strong>Permabanned on {{ bot.name }}</strong></td>
+                                <td>{%if user.banned == 1 %}Yes{% else %}No{% endif %}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+            </div>
+        </div>
+                    {% if user_duel_stats %}
+        <div class="panel panel-default" style="border: 0;">
+            <div class="panel-heading">
+                <h3><strong>Duel stats</strong></h3>
+            </div>
+            <div class="panel-body">
+                    <table class="table table-responsive borderless table-striped">
+                        <tbody>
+                            <tr>
+                                <td><strong>Duels Total</strong></td>
+                                <td>{{ user_duel_stats.duels_total }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Duels Won</strong></td>
+                                <td>{{ user_duel_stats.duels_won }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Duels Lost</strong></td>
+                                <td>{{ user_duel_stats.duels_lost }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Winrate</strong></td>
+                                <td>{{ user_duel_stats.winrate|round(2) }}%</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Profit from duels</strong></td>
+                                <td>{{ user_duel_stats.profit }} points</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Last duel</strong></td>
+                                <td>{{ user_duel_stats.last_duel|localize|strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                            </tr>
+                            {% if user_duel_stats.longest_winstreak > 1 %}
+                            <tr>
+                                <td><strong>Longest Win Streak</strong></td>
+                                <td>{{ user_duel_stats.longest_winstreak }}</td>
+                            </tr>
+                            {% endif %}
+                            {% if user_duel_stats.longest_losestreak > 1 %}
+                            <tr>
+                                <td><strong>Longest Lose Streak</strong></td>
+                                <td>{{ user_duel_stats.longest_losestreak }}</td>
+                            </tr>
+                            {% endif %}
+                            {% if user_duel_stats.current_streak > 1 %}
+                            <tr>
+                                <td><strong>Current Win Streak</strong></td>
+                                <td>{{ user_duel_stats.current_streak }}</td>
+                            </tr>
+                            {% elif user_duel_stats.current_streak < -1 %}
+                            <tr>
+                                <td><strong>Current Lose Streak</strong></td>
+                                <td>{{ user_duel_stats.current_streak|abs }}</td>
+                            </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+            </div>
+        </div>
         {% endif %}
+    </div>
     </div>
 </div>
 {% endblock %}

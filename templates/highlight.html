@@ -2,34 +2,46 @@
 {% set active_page = 'highlights' %}
 {% block title %}Highlight - {{ highlight.id }}{% endblock %}
 {% block body %}
-<h2>{{ stream.title }}</h2>
-<div class="ui image video_thumbnail">
-    {%- include 'helper/highlight_thumbnail_img.html' -%}
+<div class="row">
+    <div class="col-md-12">
+        <h1 class="page-head-line">{{ stream.title }}</h1>
+        <div class="media">
+            <div class="media-left">
+                <div class="video_thumbnail">
+                    {%- include 'helper/highlight_thumbnail_img.html' -%}
+                </div>
+	    </div>
+        </div>
+    </div>
 </div>
-<table class="ui very basic table">
-    <tbody>
-        <tr>
-            <th>Created at</th>
-            <td><span class="date">{{ highlight.created_at|time_ago }} ago | {{ highlight.created_at|date_format }}</span></td>
-        </tr>
-        {% if highlight.description %}
-        <tr>
-            <th>Description</th>
-            <td class="pemote">{{ highlight.description }}</td>
-        </tr>
-        {% endif %}
-        <tr>
-            <th>Link</th>
-            <td><a href="{{ highlight.video_url }}">{{ highlight.video_url }}</a></td>
-        </tr>
-        <tr>
-            <th>ID</th>
-            <td>{{ highlight.id }}</td>
-        </tr>
-        <tr>
-            <th>Offset</th>
-            <td>{{ highlight.highlight_offset }} seconds</td>
-        </tr>
-    </tbody>
-</table>
+<div class="row" style="padding-top: 15px;">
+    <div class="col-md-12">
+        <table class="table table-responsive borderless">
+            <tbody>
+                <tr>
+                    <td><strong>Created at</strong></td>
+		    <td><span class="date">{{ highlight.created_at|time_ago }} ago | {{ highlight.created_at|date_format }}</span></td>
+		</tr>
+		    {% if highlight.description %}
+		<tr>
+                    <td><strong>Description</strong></td>
+		    <td class="pemote">{{ highlight.description }}</td>
+                </tr>
+		{% endif %}
+		<tr>
+                    <td><strong>Link</strong></td>
+                    <td><a href="{{ highlight.video_url }}">{{ highlight.video_url }}</a></td>
+                </tr>	
+                <tr>
+                    <td><strong>ID</strong></td>
+                    <td>{{ highlight.id }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Offset</strong></td>
+                    <td>{{ highlight.highlight_offset }} seconds</td>
+                </tr>
+            </tbody>												
+        </table>
+    </div>
+</div>
 {% endblock %}

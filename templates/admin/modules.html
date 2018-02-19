@@ -2,11 +2,15 @@
 {% set active_page = 'admin_modules' %}
 {% block title %}Modules{% endblock %}
 {% block body %}
-<h2>Modules</h2>
-<div id="bot_moderators">
-    <table class="ui very basic table">
+<div class="row">
+    <div class="col-md-12">
+        <h2 class="page-head-line">Modules</h2>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+    <table class="table table-responsive table-striped">
         <thead>
-            <tr><th colspan="2"><h4>{{title}}</h4></th></tr>
             <tr>
                 <th class="collapsing">Module</th>
                 <th>Description</th>
@@ -20,15 +24,17 @@
                 <td>{{ row.DESCRIPTION }}</td>
                 <td class="right aligned collapsing">
                     {%- if row.db_module.enabled %}
-                    <button class="ui compact button toggle-row"><i class="icon power red"></i><span class="text">Disable</span></button>
+                    <button class="btn btn-default toggle-row"><i class="fa fa-power-off color-red"></i><span class="text"> Disable</span></button>
                     {% else %}
-                    <button class="ui compact button toggle-row"><i class="icon power green"></i><span class="text">Enable</span></button>
+                    <button class="btn btn-default toggle-row"><i class="fa fa-power-off color-green"></i><span class="text"> Enable</span></button>
                     {% endif -%}
-                <button class="ui compact button edit-row"><i class="icon setting"></i>Configure</button></td>
+                <button class="btn btn-default edit-row"><i class="fa fa-cog"></i> Configure</button></td>
             </tr>
 {% endfor %}
         </tbody>
     </table>
+    
+    </div>
 </div>
 {% endblock %}
 {% block footer %}

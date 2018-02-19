@@ -127,10 +127,12 @@ $(document).ready(function() {
         row.find('div.display').show();
         row.find('div.edit').hide();
     });
+    $('table.editcommand .dropdown .dropdown-menu li').click(function(){
+        $(this).parents('.dropdown').find('button').html('<i class="fa fa-caret-down"></i> ' + $(this).text());
+        $(this).parents('.dropdown').find('input').val($(this).data('value'));
+    });
 
-    $('table.editcommand .ui.dropdown').dropdown();
-
-    $('table.editcommand .ui.checkbox').checkbox({
+    $('table.editcommand .checkbox-inline').checkbox({
         onChange: function() {
             var label = $(this).parent().find('label');
             if ($(this).prop('checked')) {

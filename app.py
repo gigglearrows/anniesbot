@@ -190,6 +190,7 @@ try:
                 for highlight in highlights:
                     highlight.thumbnail = True
 except ImportError:
+    log.exception('asd')
     pass
 
 @app.route('/')
@@ -201,6 +202,10 @@ def index():
         log.exception('Unhandled exception in def index')
     return render_template('index.html',
             custom_content=custom_content)
+
+@app.route('/riot.txt')
+def riot():
+    return render_template('riot.txt')
 
 @app.route('/commands/')
 def commands():
@@ -638,31 +643,34 @@ def number_format(value, tsep=',', dsep='.'):
 module_manager = ModuleManager(None).load()
 
 nav_bar_header = []
-nav_bar_header.append(('/', 'home', 'Home'))
-nav_bar_header.append(('/commands/', 'commands', 'Commands'))
+nav_bar_header.append(('/', 'home', 'Home', 'dashboard'))
+nav_bar_header.append(('/commands/', 'commands', 'Commands', 'exclamation'))
 if 'deck' in module_manager:
-    nav_bar_header.append(('/decks/', 'decks', 'Decks'))
+    nav_bar_header.append(('/decks/', 'decks', 'Decks', 'ticket'))
 if config['main']['nickname'] not in ['scamazbot']:
-    nav_bar_header.append(('/points/', 'points', 'Points'))
-nav_bar_header.append(('/stats/', 'stats', 'Stats'))
-nav_bar_header.append(('/highlights/', 'highlights', 'Highlights'))
+    nav_bar_header.append(('/points/', 'points', 'Points', 'money'))
+nav_bar_header.append(('/stats/', 'stats', 'Stats', 'ellipsis-h'))
+nav_bar_header.append(('/highlights/', 'highlights', 'Highlights', 'youtube-play'))
 if 'pleblist' in modules:
-    nav_bar_header.append(('/pleblist/history/', 'pleblist', 'Pleblist'))
+    nav_bar_header.append(('/pleblist/history/', 'pleblist', 'Pleblist', 'headphones'))
+
+
+
 
 nav_bar_admin_header = []
-nav_bar_admin_header.append(('/', 'home', 'Home'))
-nav_bar_admin_header.append(('/admin/', 'admin_home', 'Admin Home'))
+nav_bar_admin_header.append(('/', 'home', 'Home', 'home'))
+nav_bar_admin_header.append(('/admin/', 'admin_home', 'Admin Home', 'dashboard'))
 nav_bar_admin_header.append(([
     ('/admin/banphrases/', 'admin_banphrases', 'Banphrases'),
     ('/admin/links/blacklist/', 'admin_links_blacklist', 'Blacklisted links'),
     ('/admin/links/whitelist/', 'admin_links_whitelist', 'Whitelisted links'),
-    ], None, 'Filters'))
-nav_bar_admin_header.append(('/admin/commands/', 'admin_commands', 'Commands'))
-nav_bar_admin_header.append(('/admin/timers/', 'admin_timers', 'Timers'))
-nav_bar_admin_header.append(('/admin/moderators/', 'admin_moderators', 'Moderators'))
-nav_bar_admin_header.append(('/admin/modules/', 'admin_modules', 'Modules'))
+    ], None, 'Filters', 'ban'))
+nav_bar_admin_header.append(('/admin/commands/', 'admin_commands', 'Commands', 'exclamation'))
+nav_bar_admin_header.append(('/admin/timers/', 'admin_timers', 'Timers', 'clock-o'))
+nav_bar_admin_header.append(('/admin/moderators/', 'admin_moderators', 'Moderators', 'gavel'))
+nav_bar_admin_header.append(('/admin/modules/', 'admin_modules', 'Modules', 'magnet'))
 if 'predict' in module_manager:
-    nav_bar_admin_header.append(('/admin/predictions/', 'admin_predictions', 'Predictions'))
+    nav_bar_admin_header.append(('/admin/predictions/', 'admin_predictions', 'Predictions', 'eye'))
 
 version = Bot.version
 last_commit = ''

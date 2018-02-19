@@ -2,17 +2,24 @@
 {% set active_page = 'highlights' %}
 {% block title %}Highlights{% endblock %}
 {% block body %}
-<h2>Highlights</h2>
-<p><a href="#calendar"><i class="icon linkify"></i> Browse Calendar</a></p>
-
-<div class="ui divided items">
-{% for highlight in highlights %}
-{% include 'highlight/list.html' %}
-{% endfor %}
-</div>
-<h3>Find more highlights here</h3>
-<div id="calendar"></div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <h1 class="page-head-line">Highlights</h1>
+                        <h1 class="page-subhead-line"><i class="fa fa-paperclip fa-lg"></i> List of all recent highlights from stream.  <a href="#calendar"><i class="fa fa-link"></i> Browse Calendar</a></h1>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                    {% for highlight in highlights %}
+                    {% include 'highlight/list.html' %}
+                    <hr />
+                    {% endfor %}
+                    </div>
+                </div>
+                <h3>Find more highlights here</h3>
+                <div id="calendar"></div>
 {% endblock %}
+
 {% block footer %}
 <script type="text/javascript" src="/static/scripts/highlights.datepicker.js"></script>
 <script type="text/javascript">
@@ -25,3 +32,4 @@ $(document).ready(function() {
 });
 </script>
 {% endblock %}
+

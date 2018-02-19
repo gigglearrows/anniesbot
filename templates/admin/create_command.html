@@ -2,56 +2,55 @@
 {% set active_page = 'admin_commands' %}
 {% block title %}Create Command{% endblock %}
 {% block body %}
-<h2>Create Command</h2>
-<form class="ui form" method="POST">
-    <div class="fields">
-        <div class="required field field-alias four wide">
+<h1 class="page-head-line">Create Command</h1>
+<form class="form-horizontal" method="POST">
+    <div class="form-group">
+        <div class="required field field-alias col-xs-4">
             <label>Aliases</label>
-            <input class="alias" type="text" placeholder="New alias..." />
+            <input class="alias form-control" type="text" placeholder="New alias..." />
             <div class="alias-button-bar">
-                <div class="aliases"></div>
+                <h4><big><div class="aliases"></div></big></h4>
             </div>
-            <input type="hidden" name="aliases" />
+            <input type="hidden" class="form-control" name="aliases" />
         </div>
     </div>
-    <div class="fields">
-        <div class="required field four wide">
+    <div class="fields form-group">
+        <div class="required field col-xs-3">
             <label>Level</label>
-            <input type="number" name="level" placeholder="Level" value="100" />
+            <input type="number" name="level" class="form-control" placeholder="Level" value="100" />
         </div>
-        <div class="required field four wide">
+        <div class="required field col-xs-3">
             <label>Global cooldown</label>
-            <input type="number" name="cd" placeholder="Cooldown" value="5" />
+            <input type="number" name="cd" class="form-control" placeholder="Cooldown" value="5" />
         </div>
-        <div class="required field four wide">
+        <div class="required field col-xs-3">
             <label>Per-user cooldown</label>
-            <input type="number" name="usercd" placeholder="Cooldown" value="15" />
+            <input type="number" name="usercd" class="form-control" placeholder="Cooldown" value="15" />
         </div>
-        <div class="required field four wide">
+        <div class="required field col-xs-3">
             <label>Point cost</label>
-            <input type="number" name="cost" placeholder="Cost" value="0" />
+            <input type="number" name="cost" class="form-control" placeholder="Cost" value="0" />
         </div>
     </div>
-    <div class="fields">
-        <div class="required field four wide">
+    <div class="fields form-group">
+        <div class="required field col-xs-4">
             <label>Reply type</label>
-            <select class="ui dropdown" name="reply">
+            <select class="ui dropdown form-control" name="reply">
                 <option value="say">Say</option>
                 <option value="me">Me</option>
                 <option value="whisper">Whisper</option>
                 <option value="reply">Context-dependant reply</option>
             </select>
         </div>
-        <div class="required field twelve wide">
+        <div class="required field col-xs-8">
             <label>Response</label>
-            <input type="text" name="response" placeholder="Response" />
+            <input type="text" name="response" class="form-control" placeholder="Response" />
         </div>
     </div>
-    <div class="ui message warning" style="padding: 0.4em;"></div>
-    <div class="ui message error" style="padding: 0.4em;"></div>
-</div>
+    <div class="alert alert-warning ui message warning" style="padding: 0.4em;"></div>
+    <div class="alert alert-danger ui message error" style="padding: 0.4em;"></div>
 </form>
-<div class="ui submit button green">Create</div>
+<div class="btn btn-success submit">Create</div>
 {% endblock %}
 {% block footer %}
 <script src="/static/scripts/admin/create_command.js"></script>

@@ -1,98 +1,138 @@
 <!DOCTYPE html>
 <html>
+<head>
 <title>{{ streamer.name }} - {% block title %}Title{% endblock %}</title>
 <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
 .pui.badge.subscriber {
     background-image: url('/static/images/badge_sub_{{ streamer.full_name }}.png');
     background-size: 100%;
 }
 </style>
-<link rel="stylesheet" type="text/css" href="/static/semantic/semantic.min.css">
+<link rel="stylesheet" type="text/css" href="/static/css/bootstrap.min.css">
+<link rel="stylesheet" type="text/css" href="/static/css/bootstrap-social.css">
 <link rel="stylesheet" type="text/css" href="/static/css/base.min.css?{{ commit_number }}">
+<link rel="stylesheet" type="text/css" href="/static/css/font-awesome.css">
+<link rel="stylesheet" type="text/css" href="/static/css/basic.css">
+<link rel="stylesheet" type="text/css" href="/static/css/custom.css">
+<link rel="stylesheet" type="text/css" href="/static/css/{{ streamer.full_name }}.css">
+<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Open+Sans">
 <link rel="stylesheet" type="text/css" href="//cdn.pajlada.se/css/pickadate/default.css">
 <link rel="stylesheet" type="text/css" href="//cdn.pajlada.se/css/pickadate/default.date.css">
 </head>
 <body class="main body">
 {% set active_page = active_page|default('home') %}
-<header class="main header">
+<div id="wrapper">
 {% block menu %}
-    <div class="ui top fixed menu">
-        {% for href, id, caption in nav_bar_header %}
-        <a class="item{% if id == active_page %} active{% endif %}" href="{{ href }}">
-            {% if id == 'home' %}
-            <img class="logo" src="/static/images/logo_{{ streamer.full_name }}_tn.png" alt="{{ streamer.name }} logo"/>
-            {% endif %}
-            {{ caption }}</a>
-        {% endfor %}
-        <div class="right menu">
-            <div class="item">
-                <div class="ui transparent icon input">
-                    <form id="usersearch">
-                        <div class="ui action input">
-                            <input type="text" name="username" class="username" placeholder="Username">
-                            <button class="ui icon button">
-                                <i class="search icon"></i>
-                            </button>
+        <nav class="navbar navbar-default navbar-cls-top " role="navigation" style="margin-bottom: 0">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".sidebar-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="/">GiggleArrows</a>
+            </div>
+                    <div class="header-left col-sm-3">
+                        <form class="form-inline" id="usersearch" role="form">
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <span class="input-group-addon"><i class="fa fa-user"></i></span>
+                                    <input type="text" name="username" class="form-control username" id="focusedInput" placeholder="Search username"> 
+                                    <span class="input-group-btn">
+                                        <button type="submit" class="btn btn-default">
+                                            <i class="fa fa-search"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                            </div>
+                        </form>
+            </div> 
+            <div class="header-right">
+              <a href="//gigglearrows.com" class="btn btn-success" title="Back to select streamer"><b>Select Streamer </b></a>
+			  <a href="//anniefuchsia.gigglearrows.com" class="btn btn-fuchsia" title="AnnieFuchsia"><b>AnnieFuchsia</b></a>
+              <a href="//linneafly.gigglearrows.com" class="btn btn-primary" title="Linneafly"><b>Linneafly</b></a>
+			  <a href="//amaliuz.gigglearrows.com" class="btn btn-warning" title="ProxyFox"><b>ProxyFox</b></a>
+            </div>
+        </nav>
+        <nav class="navbar-default navbar-side" role="navigation">
+            <div class="sidebar-collapse">
+                <ul class="nav" id="main-menu">
+                    <li>
+                        <div class="user-img-div">
+                            <img src="/static/images/logo_{{ streamer.full_name }}_tn.png" alt="{{ streamer.name }} logo" class="img-thumbnail" />
+                            <a href="https://twitch.tv/{{ streamer.full_name }}" target="_blank">
+							    <span class="fa-stack fa-lg">
+                                    <i class="fa fa-square fa-stack-2x color-white"></i>
+                                    <i class="fa fa-twitch fa-stack-1x color-purple"></i>
+                                </span>
+                            </a>
+                            <a href="https://twitter.com/{{ streamer.full_name}}" target="_blank">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fa fa-square fa-stack-2x color-white"></i>
+                                    <i class="fa fa-twitter fa-stack-1x color-twitter"></i>
+                                </span>
+							</a>
+							
+                            <a href="https://youtube.com/{{ streamer.full_name }}" target="_blank">
+							<img class="img-rounded" src="/static/images/youtubecolor.png" />
+							</a>
+                            <div class="inner-text">
+                                Twitch: {{ streamer.name }}
+                            <br />
+							    Bot: {{ bot.name }}
+	
+                            </div>
                         </div>
-                    </form>
-                </div>
+
+                    </li>
+                    {% for href, id, caption, icon in nav_bar_header %}
+                    <li>
+                        <a {% if id == active_page %} class="active-menu"{% endif %} href="{{ href }}"><i class="fa fa-{{ icon }} fa-fw"></i>{{ caption }}</a>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+        </nav>
+{% endblock %}
+        <div id="page-wrapper">
+            <div id="page-inner">
+            {% block body %}{% endblock %}          	
             </div>
         </div>
     </div>
-{% endblock %}
-</header>
-<main class="main container">
-    {% block body %}{% endblock %}
-</main>
-<br />
-<footer class="main footer">
-<div class="ui inverted vertical footer segment">
-    <div class="ui container">
-      <div class="ui stackable inverted divided equal height stackable grid">
-        <div class="three wide column">
-          <h4 class="ui inverted header">Community</h4>
-          <div class="ui inverted link list">
-           <a class="item" href="https://github.com/pajlada/pajbot/issues"><i class="warning circle icon"></i> Submit an Issue</a>
-           <a class="item" href="/contact"><i class="mail icon"></i> Contact</a>
+    <div id="footer-sec">
+          {% if session.user %}<h5>Hello {{ session.user.username_raw }}</h5>
+          <a class="item" href="/admin/"><i class="fa fa-cog"></i> Admin Zone</a>
+          | <a class="item" href="/logout"><i class="fa fa-sign-out"></i> Log out</a>{% else %}
+            <h4>Login <i class="fa fa-sign-in"></i></h4>
+          <a href="/login" class="btn btn-social btn-twitch"><i class="fa fa-twitch"></i>Connect with Twitch</a>{% endif %}
+          <div class="row">
+          <a class="item" href="/contact"><i class="fa fa-envelope"></i> Contact</a> | <a class="item" href="https://github.com/gigglearrows/anniesbot/issues" target="_blank"><i class="fa fa-exclamation-circle"></i> Submit an Issue</a>
+          | <a class="item" href="https://github.com/gigglearrows/anniesbot/" target="_blank"><i class="fa fa-github-square"></i> GitHub Repo</a> | <a class="item" href="http://pajbot.com/" target="_blank"><i class="fa fa-star"></i> Other Bots</a>
           </div>
-        </div>
-        <div class="three wide column">
-          <h4 class="ui inverted header">Network</h4>
-          <div class="ui inverted link list">
-           <a class="item" href="https://github.com/pajlada/pajbot/"><i class="github icon"></i> GitHub Repo</a>
-           <a class="item" href="http://pajbot.com/"><i class="star icon"></i> Other Bots</a>
-          </div>
-        </div>
-        <div class="four wide column">{% if session.user %}
-          <h4 class="ui inverted header">Hello {{ session.user.username_raw }}</h4>
-          <div class="ui inverted link list">
-           <a class="item" href="/admin/"><i class="rotated legal icon"></i> Admin Zone</a>
-           <a class="item" href="/logout"><i class="sign out icon"></i> Log out</a>{% else %}
-          <h4 class="ui inverted header">Login <i class="sign in icon"></i></h4>
-          <div class="ui inverted link list">
-           <a href="/login"><button class="ui twitch button"><i class="twitch icon"></i>connect with Twitch</button></a>{% endif %}
-          </div>
-        </div>
-      </div>
       <div class="row">
-       <div class="column"><br />
         <em style="color: #ccc;">Version: {{ version }}</em> &mdash; <em style="color: #ccc;">Last commit: {{ last_commit }}</em>
-       </div>
+      </div>
     </div>
-  </div>
-</div>
-</footer>
-<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
-<script src="/static/semantic/semantic.min.js"></script>
-<script src="/static/scripts/base.js?{{ commit_number }}"></script>
-<script async src="//cdn.pajlada.se/emote.js"></script>
-<script src="/static/scripts/autolinker.min.js"></script>
-<script src="//cdn.pajlada.se/js/pickadate/picker.js"></script>
-<script src="//cdn.pajlada.se/js/pickadate/picker.date.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.6/moment.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/moment-duration-format/1.3.0/moment-duration-format.min.js"></script>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+    <script type="text/javascript" src="/static/semantic/semantic.min.js"></script>
+    <script type="text/javascript" src="/static/scripts/base.js?{{ commit_number }}"></script>
+    <script type="text/javascript" src="/static/scripts/bootstrap.min.js"></script>
+
+    <script src="/static/scripts/jquery.metisMenu.js"></script>
+    <script src="/static/scripts/custom.js"></script>
+    <script src="//cdn.pajlada.se/emote.js"></script>
+    <script src="/static/scripts/autolinker.min.js"></script>
+    <script src="//cdn.pajlada.se/js/pickadate/picker.js"></script>
+    <script src="//cdn.pajlada.se/js/pickadate/picker.date.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.6/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-duration-format/1.3.0/moment-duration-format.min.js"></script>
 {% block footer %}{% endblock %}
 </body>
 </html>

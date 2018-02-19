@@ -2,35 +2,48 @@
 {% set active_page = 'commands' %}
 {% block title %}Command details{% endblock %}
 {% block body %}
-<h3>Command details</h3>
-{% include 'helper/command_table.html' %}
-{% if examples|length > 0 %}
-<div class="ui styled accordion examples">
-    {% set index = 1 %}
-    {% for example in examples -%}
-    <div class="title{{ ' active' if index == 1 else '' }}">
-        <i class="dropdown icon"></i>{{ example.title }}
+<div class="row">
+    <div class="col-md-12">
+        <h1 class="page-head-line">Command details</h1>
+        {% include 'helper/command_table.html' %}
+        {% if examples|length > 0 %}
+                <div class="panel-group examples" id="accordion" style="width: 600px;">
+                {% set index = 1 %}
+                {% for example in examples -%}
+				  <div class="panel panel-default">
+					<div class="panel-heading">
+					  <h4 class="panel-title">
+						<a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#collapse{{ index }}">
+						<i class="indicator glyphicon glyphicon-chevron-{{ 'down' if index == 1 else 'right' }}"></i><strong> {{ example.title }}</strong></a>
+					  </h4>
+					</div>
+					<div id="collapse{{ index }}" class="panel-collapse collapse{{ ' in' if index == 1 else '' }}">
+					  <div class="panel-body">
+                          {% if example.description|length > 0 %}
+                          <div class="description pemote">{{ example.description }}</div>
+                          {% endif %}
+                          {% for chat_message in example.chat_messages -%}
+                              {% include 'helper/command_chat_message.html' %}
+                          {%- endfor %}
+                      </div>
+					</div>
+				  </div>
+                  {% set index = index + 1 %}
+                  {%- endfor %}
+				</div>
+                {% endif %}
     </div>
-    <div class="content{{ ' active' if index == 1 else '' }}">
-        {% if example.description|length > 0 %}
-        <div class="description pemote">{{ example.description }}</div>
-        {% endif %}
-        {% for chat_message in example.chat_messages -%}
-        {% include 'helper/command_chat_message.html' %}
-        {%- endfor %}
-    </div>
-    {% set index = index + 1 %}
-    {%- endfor %}
 </div>
-{% endif %}
 {% endblock %}
 {% block footer %}
 <script type="text/javascript">
-$(document).ready(function() {
-    $('.ui.accordion').accordion({
-        duration: 200,
-        collapsible: false
-    });
-});
+function toggleChevron(e) {
+    $(e.target)
+        .prev('.panel-heading')
+        .find('i.indicator')
+        .toggleClass('glyphicon-chevron-down glyphicon-chevron-right');
+}
+$('#accordion').on('hide.bs.collapse', toggleChevron);
+$('#accordion').on('show.bs.collapse', toggleChevron);
 </script>
 {% endblock %}

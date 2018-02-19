@@ -1,7 +1,13 @@
 {% extends "layout.html" %}
 {% set active_page = 'none' %}
-{% block title %}500 - You seem to be lost!{% endblock %}
+{% block title %}500 - Server error{% endblock %}
 {% block body %}
-<h1>500</h1>
-<p>An internal server error has occured.</p>
+<div class="row">
+    <div class="col-md-12">
+        <h1 class="page-head-line">500</h1>
+        <h3>An internal server error has occured.</h3>
+    </div>
+</div>
 {% endblock %}
+
+

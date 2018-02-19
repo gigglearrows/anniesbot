@@ -2,10 +2,22 @@
 {% set active_page = 'contact' %}
 {% block title %}Contact{% endblock %}
 {% block body %}
-<div class="ui segment">
-<h2>Contact</h2>
-<p>Hi, I'm pajlada! I'm the current maintainer and developer of {{ bot.name }}.</p>
-<p>{{ bot.name }} is running on the <strong>pajbot</strong> source, which is coded in Python.</p>
-<p>Got any questions or comments about the bot or the website? <a href="http://twitch.tv/message/compose?to=pajlada">Let me know by sending me a twitch message!</a></p>
-</div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <h1 class="page-head-line">Contact</h1>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <p>Hi, I'm <strong>Gigglearrows</strong>! I'm the current maintainer and developer of <strong>{{ bot.name }}</strong>.</p>
+                        <p><strong>{{ bot.name }}</strong> is running on the <strong>pajbot</strong> source, which is coded in Python. Thanks to Pajlada for providing the pajbot source</p>
+                        <p> I have added and tweaked alot of new features for the bot. If you have any questions or comments about the bot or the website? <a href="http://twitch.tv/message/compose?to=gigglearrows"><strong>Let me know by sending me a message on Twitch!</strong></a></p>
+                        <div class="alert alert-info">
+                            I made this website as an easier overview for my bots. Here you can find commands, points, lines leaderboard, admin panel and other stuff related to the stream and bot.
+                        </div>
+			<div class="alert alert-danger">
+                            I will keep adding more streamers on my website if other streams start using my bot as well.
+                        </div>			
+                    </div>
+                </div>
 {% endblock %}

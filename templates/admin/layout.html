@@ -1,27 +1,88 @@
 {% extends "layout.html" %}
 {% block menu %}
-    <div class="ui top fixed menu inverted blue">
-        {% for href, id, caption in nav_bar_admin_header %}
-        {%- if id %}
-        <a class="inverted blue item{%- if id == active_page %} active{% endif -%}" href="{{ href }}">
-            {%- if id == 'home' %}
-            <img class="logo" src="/static/images/logo_{{ streamer.full_name }}_tn.png" alt="{{ streamer.name }} logo"/>
-            {% endif -%}
-            {{ caption }}</a>
-        {%- else %}
-        <div class="ui compact menu inverted blue">
-            <div class="ui simple dropdown item">{{ caption }}<i class="dropdown icon"></i>
-                <div class="menu">
-                    {%- for href, id, caption in href %}
-        <a class="inverted blue item{% if id == active_page %} active{% endif %}" href="{{ href }}">
-            {%- if id == 'home' %}
-            <img class="logo" src="/static/images/logo_{{ streamer.full_name }}_tn.png" alt="{{ streamer.name }} logo"/>
-            {% endif -%}
-            {{ caption }}</a>
-                    {% endfor -%}
+        <nav class="navbar navbar-default navbar-cls-top " role="navigation" style="margin-bottom: 0">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".sidebar-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="/">GiggleArrows</a>
+            </div>
+                <div class="col-md-3">
+                    <div class="header-left">
+                        <form class="form-inline" id="usersearch">
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <span class="input-group-addon"><i class="fa fa-user"></i></span>
+                                    <input type="text" name="username" class="form-control" id="focusedInput" placeholder="Search username"> 
+                                </div>
+                            </div>
+                            <button class="btn btn-default">
+                                    <i class="fa fa-search"></i>
+                                </button>
+                            
+                        </form>
                 </div>
-        </div>
-        {% endif -%}
-        {% endfor %}
-    </div>
+            </div> 
+            <div class="header-right">
+              <a href="//gigglearrows.com" class="btn btn-success" title="Back to select streamer"><b>Select Streamer </b></a>
+			  <a href="//anniefuchsia.gigglearrows.com" class="btn btn-fuchsia" title="AnnieFuchsia"><b>AnnieFuchsia</b></a>
+              <a href="//linneafly.gigglearrows.com" class="btn btn-primary" title="Linneafly"><b>Linneafly</b></a>
+			  <a href="//amaliuz.gigglearrows.com" class="btn btn-warning" title="Proxyfox"><b>Proxyfox</b></a>
+            </div>
+        </nav>
+        <nav class="navbar-default navbar-side" role="navigation">
+            <div class="sidebar-collapse admin">
+                <ul class="nav" id="main-menu">
+                    <li>
+                        <div class="user-img-div">
+                            <img src="/static/images/logo_{{ streamer.full_name }}_tn.png" alt="{{ streamer.name }} logo" class="img-thumbnail" />
+                            <a href="https://twitch.tv/{{ streamer.full_name }}" target="_blank">
+							    <span class="fa-stack fa-lg">
+                                    <i class="fa fa-square fa-stack-2x color-white"></i>
+                                    <i class="fa fa-twitch fa-stack-1x color-purple"></i>
+                                </span>
+                            </a>
+                            <a href="https://twitter.com/{{ streamer.full_name}}" target="_blank">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fa fa-square fa-stack-2x color-white"></i>
+                                    <i class="fa fa-twitter fa-stack-1x color-twitter"></i>
+                                </span>
+							</a>
+							
+                            <a href="https://youtube.com/{{ streamer.full_name }}" target="_blank">
+							<img class="img-rounded" src="/static/images/youtubecolor.png" />
+							</a>
+                            <div class="inner-text">
+                                Twitch: {{ streamer.name }}
+                            <br />
+							    Bot: {{ bot.name }}
+	
+                            </div>
+                        </div>
+
+                    </li>
+                    {% for href, id, caption, icon in nav_bar_admin_header %}
+                    {%- if id %}
+                    <li>
+                        <a {% if id == active_page %} class="active-menu"{% endif %} href="{{ href }}"><i class="fa fa-{{ icon }} fa-fw"></i>{{ caption }}</a>
+                    </li>
+                    {%- else %}
+                    <li{%- for href, id, caption in href %}{% if id == active_page %} class="active"{% endif %}{% endfor -%}>
+                        <a href="#"><i class="fa fa-{{ icon }} fa-fw"></i>{{ caption }} <span class="fa arrow"></span></a>
+                        <ul class="nav nav-second-level admin collapse">
+                            {%- for href, id, caption in href %}
+                            <li>
+                                <a {% if id == active_page %} class="active-menu"{% endif %} href="{{ href }}"><i class="fa fa-{{ icon }} fa-fw"></i>{{ caption }}</a>
+                            </li>
+                            {% endfor -%}
+                        </ul>
+                    </li>
+                    {% endif -%}   
+                    {% endfor -%}
+                </ul>
+            </div>
+        </nav>
 {% endblock %}

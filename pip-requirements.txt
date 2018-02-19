@@ -17,7 +17,12 @@ requests
 
 # New regex library with support for some fancy features we require
 regex
+
+# LASTFM song command
 pylast
+
+# League of Legends API fetcher
+riotwatcher
 
 # Used to communicating with the redis server
 # The redis service is required for storing data such as
@@ -34,7 +39,7 @@ redis
 pymysql
 
 # Required for the basic features of the web interface
-# -r requirements/web.txt
+ -r requirements/web.txt
 
 # Required for Websocket
 #pyOpenSSL
@@ -44,4 +49,4 @@ pymysql
 # -r requirements/pleblist.txt
 
 # Required for generating thumbnails for the logo
-# -r requirements/thumbnail.txt
+ -r requirements/thumbnail.txt

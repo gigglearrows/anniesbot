@@ -2,23 +2,31 @@
 {% set active_page = 'admin_links_blacklist' %}
 {% block title %}Admin - Blacklisted Links{% endblock %}
 {% block body %}
-<h2>Blacklisted Links</h2>
-<table class="ui table basic">
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Type</th>
-            <th>Link</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for link in links %}
-        <tr>
-            <td>{{ link.id }}</td>
-            <td>{{ 'Deep' if link.level == 1 else 'Shallow' }}</td>
-            <td>{{ link.domain }}{{ link.path }}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+<div class="row">
+    <div class="col-md-12">
+        <h1 class="page-head-line">Blacklisted Links</h1>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <table class="table table-responsive table-striped">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Type</th>
+                    <th>Link</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for link in links %}
+                <tr>
+                    <td>{{ link.id }}</td>
+                    <td>{{ 'Deep' if link.level == 1 else 'Shallow' }}</td>
+                    <td>{{ link.domain }}{{ link.path }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
 {% endblock %}

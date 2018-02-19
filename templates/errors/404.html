@@ -2,8 +2,11 @@
 {% set active_page = 'none' %}
 {% block title %}404 - You seem to be lost!{% endblock %}
 {% block body %}
-<h1>404</h1>
-<p>Page not found.</p>
-<p>Use the menu above to find your way.</p>
-<p><img src="/static/images/sad.png" alt="FeelsBadMan" /></p>
+<div class="row">
+    <div class="col-md-12">
+        <h1 class="page-head-line">404</h1>
+        <p><img src="/static/images/sad.png" alt="FeelsBadMan" /></p>
+        <h3>Use the menu above to find your way.</h3>
+    </div>
+</div>
 {% endblock %}

@@ -1,101 +1,90 @@
-{% extends "layout.html" %}
+﻿{% extends "layout.html" %}
 {% set active_page = 'commands' %}
 {% block title %}Commands{% endblock %}
 {% block body %}
-<h2>Commands</h2>
-<div id="commands">
-<div class="ui top attached tabular menu">
-    <a class="item custom active" data-tab="custom">Regular Commands</a>
-    {% if point_commands|length > 0 %}
-        <a class="item point" data-tab="point">Point Commands</a>
-    {% endif %}
-    {% if moderator_commands|length > 0 %}
-        <a class="item moderator" data-tab="moderator">Moderator Commands</a>
-    {% endif %}
-</div>
-<div class="ui bottom attached tab segment active" data-tab="custom">
-    <table class="ui very basic table">
-        <thead>
-            <tr>
-                <th>Command</th>
-                <th>Output/Description</th>
-            </tr>
-        </thead>
-        <tbody>
-    {% for command in custom_commands %}
-    <tr>
-        <td>{% include 'helper/command_usage.html' %}</td>
-        <td class="pemote">{{ command.parsed_description }}</td>
-    </tr>
-    {% endfor %}
-        </tbody>
-    </table>
-</div>
-<div class="ui bottom attached tab segment" data-tab="point">
-    <table class="ui very basic table">
-        <thead>
-            <tr>
-                <th>Command</th>
-                <th>Cost</th>
-                <th>Description</th>
-            </tr>
-        </thead>
-        <tbody>
-    {% for command in point_commands %}
-    <tr>
-        <td>{% include 'helper/command_usage.html' %}</td>
-        <td>{{ command.cost }}</td>
-        <td class="pemote">{{ command.parsed_description }}</td>
-    </tr>
-    {% endfor %}
-        </tbody>
-    </table>
-</div>
-<div class="ui bottom attached tab segment" data-tab="moderator">
-    <table class="ui very basic table">
-        <thead>
-            <tr>
-                <th>Command</th>
-                <th>Description</th>
-            </tr>
-        </thead>
-        <tbody>
-    {% for command in moderator_commands %}
-    <tr>
-        <td>{% include 'helper/command_usage.html' %}</td>
-        <td class="pemote">{{ command.parsed_description }}</td>
-    </tr>
-    {% endfor %}
-        </tbody>
-    </table>
-</div>
-</div>
-{% endblock %}
-{% block footer %}
-<script type="text/javascript">
-$(document).ready(function() {
-    $('#commands .menu .item')
-        .tab({
-            context: $('#commands'),
-        });
-
-    function update_tab()
-    {
-        var hash = window.location.hash.substring(1);
-
-        if (hash.length > 1) {
-            var el = $('#commands .menu .item.'+hash);
-            if (el !== undefined) {
-                el.click();
-            }
-        }
-    }
-
-    update_tab();
-
-    $(window).bind('hashchange', function(e) {
-        update_tab();
-    });
-});
-</script>
-{% endblock %}
+                <div class="row">
+                    <div class="col-md-12">
+                        <h1 class="page-head-line">Commands</h1>
+                        <h1 class="page-subhead-line"><i class="fa fa-paperclip fa-lg"></i> List of all the commands that can be run by the bot. Check out each category: </h1>
+                        <ul class="nav nav-tabs">
+                            <li role="presentation" class="active"><a data-toggle="tab" href="#regular-commands">Regular Commands</a></li>
+                            {% if point_commands|length > 0 %}
+                            <li role="presentation"><a data-toggle="tab" href="#point-commands">Point Commands</a></li>
+                            {% endif %}
+                            {% if moderator_commands|length > 0 %}
+                            <li role="presentation"><a data-toggle="tab" href="#mod-commands">Moderator Commands</a></li>
+                            {% endif %}
+                        </ul>
+						<div class="tab-content">
+                            <div id="regular-commands" class="tab-pane fade in active">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <table class="table table-responsive table-striped">
+										    <thead>
+										        <tr>
+										            <th>Command</th>
+										            <th>Output</th>
+										        </tr>
+										    </thead>
+										    <tbody>
+                                                {% for command in custom_commands %}
+                                                <tr>
+                                                    <td>{% include 'helper/command_usage.html' %}</td>
+                                                    <td class="pemote">{{ command.parsed_description }}</td>
+                                                </tr>   
+                                                {% endfor %}
+                                            </tbody>												
+						                 </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="point-commands" class="tab-pane fade">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <table class="table table-responsive table-striped">
+										    <thead>
+										        <tr>
+										            <th>Command</th>
+										            <th>Cost</th>
+													<th>Description</th>
+										        </tr>
+										    </thead>
+										    <tbody>
+                                                {% for command in point_commands %}
+                                                <tr>
+                                                    <td>{% include 'helper/command_usage.html' %}</td>
+                                                    <td>{{ command.cost }}</td>
+                                                    <td class="pemote">{{ command.parsed_description }}</td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>												
+						                 </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="mod-commands" class="tab-pane fade">
+                                <div class="row">
+                                    <div class="col-md-12">
+						                <table class="table table-responsive table-striped">
+										    <thead>
+										        <tr>
+										            <th>Command</th>
+										            <th>Description</th>
+										        </tr>
+										    </thead>
+										    <tbody>
+                                                {% for command in moderator_commands %}
+                                                <tr>
+                                                    <td>{% include 'helper/command_usage.html' %}</td>
+                                                    <td class="pemote">{{ command.parsed_description }}</td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>												
+						                 </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endblock %}

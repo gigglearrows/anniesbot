@@ -3,173 +3,153 @@
 {% block title %}Admin - Commands{% endblock %}
 {% block body %}
 {% if created %}
-<div class="ui success message">
-    <i class="close icon"></i>
-    <div class="header">Your Command was created successfully.</div>
+<div class="alert alert-success fade in message">
+    <a href="#" class="close" data-dismiss="alert" aria-label="close"><i class="fa fa-times"></i></a>
+    <strong>Your Command was created successfully.</strong>
 </div>
 {% elif edited %}
-<div class="ui success message">
-    <i class="close icon"></i>
-    <div class="header">Your Command was edited successfully.</div>
+<div class="alert alert-success fade in message">
+    <a href="#" class="close" data-dismiss="alert" aria-label="close"><i class="fa fa-times"></i></a>
+    <strong>Your Command was edited successfully.</strong>
 </div>
 {% endif %}
-<button class="ui button create-command green"><i class="icon add"></i> <strong>Create Command</strong></button>
-<h2>Commands</h2>
-<p>This is a list of all commands that you can edit.</p>
+<a href="/admin/commands/create" class="btn btn-success create-command" role="button"><i class="fa fa-plus"></i> <strong> Create Command</strong></a>
+<h1 class="page-head-line">Commands</h1>
+<h1 class="page-subhead-line"><i class="fa fa-paperclip fa-lg"></i> This is a list of all commands that you can edit.</h1>
 <div id="commands">
-<div class="ui top attached tabular menu">
-    <a class="item custom active" data-tab="custom">Regular Commands</a>
-    {% if point_commands|length > 0 %}
-        <a class="item point" data-tab="point">Point Commands</a>
-    {% endif %}
-    {% if moderator_commands|length > 0 %}
-        <a class="item moderator" data-tab="moderator">Moderator Commands</a>
-    {% endif %}
-</div>
-<div class="ui bottom attached tab segment active" data-tab="custom">
-    <table class="ui very basic table">
-        <thead>
-            <tr>
-                <th>Command</th>
-                <th>Output/Description</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-    {% for command in custom_commands %}
-    <tr data-id="{{command.id}}">
-        <td><div class="anchor" id="c{{command.id}}"></div>{% include 'helper/command_usage_nolink.html' %}</td>
-        <td class="description pemote">{{ command.parsed_description }}</td>
-        {% include 'admin/helper/command_action.html' %}
-    </tr>
-    {% endfor %}
-        </tbody>
-    </table>
-</div>
-<div class="ui bottom attached tab segment" data-tab="point">
-    <table class="ui very basic table">
-        <thead>
-            <tr>
-                <th>Command</th>
-                <th>Cost</th>
-                <th>Description</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-    {% for command in point_commands %}
-    <tr data-id="{{command.id}}">
-        <td><div class="anchor" id="c{{command.id}}"></div>{% include 'helper/command_usage_nolink.html' %}</td>
-        <td class="collapsing">{{ command.cost }}</td>
-        <td class="description pemote">{{ command.parsed_description }}</td>
-        {% include 'admin/helper/command_action.html' %}
-    </tr>
-    {% endfor %}
-        </tbody>
-    </table>
-</div>
-<div class="ui bottom attached tab segment" data-tab="moderator">
-    <table class="ui very basic table">
-        <thead>
-            <tr>
-                <th>Command</th>
-                <th>Description</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-    {% for command in moderator_commands %}
-    <tr data-id="{{command.id}}">
-        <td><div class="anchor" id="c{{command.id}}"></div>{% include 'helper/command_usage_nolink.html' %}</td>
-        <td class="description pemote">{{ command.parsed_description }}</td>
-        {% include 'admin/helper/command_action.html' %}
-    </tr>
-    {% endfor %}
-        </tbody>
-    </table>
-</div>
-</div>
-<div class="ui modal remove-command">
-    <i class="close icon"></i>
-    <div class="header">Confirm Action</div>
-    <div class="content">
-        <div class="description">
-            Are you sure you want to remove this command? This action is irreversible.
+    <ul class="nav nav-tabs">
+        <li role="presentation" class="active"><a data-toggle="tab" href="#regular-commands">Regular Commands</a></li>
+        {% if point_commands|length > 0 %}
+        <li role="presentation"><a data-toggle="tab" href="#point-commands">Point Commands</a></li>
+        {% endif %}
+        {% if moderator_commands|length > 0 %}
+        <li role="presentation"><a data-toggle="tab" href="#mod-commands">Moderator Commands</a></li>
+        {% endif %}
+    </ul>
+    <div class="tab-content">
+        <div id="regular-commands" class="tab-pane fade in active">
+            <div class="row">
+                <div class="col-md-12">
+                    <table class="table table-responsive table-striped">
+                        <thead>
+                            <tr>
+                                <th>Command</th>
+                                <th>Output/Description</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for command in custom_commands %}
+                                <tr data-id="{{command.id}}">
+                                    <td><div class="anchor" id="c{{command.id}}"></div>{% include 'helper/command_usage_nolink.html' %}</td>
+                                    <td class="description pemote">{{ command.parsed_description }}</td>
+                                    {% include 'admin/helper/command_action.html' %}
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div id="point-commands" class="tab-pane fade">
+            <div class="row">
+                <div class="col-md-12">
+                    <table class="table table-responsive table-striped">
+                        <thead>
+                            <tr>
+                                <th>Command</th>
+                                <th>Cost</th>
+                                <th>Description</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for command in point_commands %}
+                                <tr data-id="{{command.id}}">
+                                    <td><div class="anchor" id="c{{command.id}}"></div>{% include 'helper/command_usage_nolink.html' %}</td>
+                                    <td class="collapsing">{{ command.cost }}</td>
+                                    <td class="description pemote">{{ command.parsed_description }}</td>
+                                    {% include 'admin/helper/command_action.html' %}
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div id="mod-commands" class="tab-pane fade">
+            <div class="row">
+                <div class="col-md-12">
+                    <table class="table table-responsive table-striped">
+                        <thead>
+                            <tr>
+                                <th>Command</th>
+                                <th>Description</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for command in moderator_commands %}
+                                <tr data-id="{{command.id}}">
+                                    <td><div class="anchor" id="c{{command.id}}"></div>{% include 'helper/command_usage_nolink.html' %}</td>
+                                    <td class="description pemote">{{ command.parsed_description }}</td>
+                                    {% include 'admin/helper/command_action.html' %}
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
-    <div class="actions">
-        <div class="ui approve button">Remove</div>
-        <div class="ui cancel button">Cancel</div>
+</div>
+<div class="modal fade remove-command" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header"> 
+                <button class="close" type="button" data-dismiss="modal"><i class="fa fa-times"></i></button>
+                <h4 class="modal-title">Confirm Action</h4>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to remove this command? This action is irreversible.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" data-dismiss="modal" class="btn btn-danger remove-command-modal">Remove</button>
+                <button type="button" data-dismiss="modal" class="btn btn-default">Cancel</button>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}
 {% block footer %}
 <script type="text/javascript">
 $(document).ready(function() {
-    $('#commands .menu .item')
-        .tab({
-            context: $('#commands'),
-        });
-
-    function update_tab()
-    {
-        var hash = window.location.hash.substring(1);
-
-        if (hash.length > 1) {
-            var el = $('#commands .menu .item.'+hash);
-            if (el !== undefined && el.length > 0) {
-                el.click();
-            } else {
-                el = $('#'+hash);
-                if (el !== undefined && el.length > 0) {
-                    var tab = el.parent().parent().parent().parent().parent().data('tab');
-                    var tab_btn = $('.tabular.menu .item[data-tab="'+tab+'"]');
-                    tab_btn.click();
-                    $(document).scrollTop(el.offset().top);
-                }
-            }
-        }
-    }
-
-    update_tab();
-
-    $(window).bind('hashchange', function(e) {
-        update_tab();
-    });
-
-    $('button.create-command').click(function() {
-        document.location.href = '/admin/commands/create';
-    });
-
-    $('button.edit-command').click(function() {
+    $('.btn.edit-command').click(function() {
         var command_id = $(this).data('id');
         document.location.href = '/admin/commands/edit/' + command_id;
     });
 
     var command_id_remove = 0
-    $('button.remove-command').click(function() {
+    $('.btn.remove-command').click(function() {
         command_id_remove = $(this).data('id');
-        $('.ui.modal.remove-command').modal('show');
+        $('.modal.remove-command').modal('show');
     });
-    $('.ui.modal.remove-command').modal({
-        onApprove: function(el) {
-            $.api({
-                on: 'now',
-                action: 'remove_command',
-                urlData: {
-                    'id': command_id_remove,
-                },
-                onSuccess: function(response, element) {
-                    $('tr[data-id="'+command_id_remove+'"]').remove();
-                },
-                onFailure: function(response, element) {
-                    console.error('something went wrong');
-                },
-            });
-        }
-    });
-    $('.message .close').on('click', function() {
-        $(this).closest('.message').transition('fade');
+    $('.btn.remove-command-modal').api({
+        action: 'remove_command',
+        successTest: function(response) {
+            return response.success || false;
+        },
+        beforeSend: function(settings) {
+			settings.urlData.id = command_id_remove;
+			return settings;
+		},
+        onSuccess: function(response, element) {
+            $('tr[data-id="'+command_id_remove+'"]').remove();
+        },
+        onFailure: function(response, element) {
+            console.error('something went wrong');
+        },
+
     });
 });
 </script>

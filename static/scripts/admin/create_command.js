@@ -11,7 +11,7 @@ function alias_changed(e) {
 function get_aliases()
 {
     var aliases = [];
-    $('.ui.form div.field-alias div.aliases div').each(function(index, el) {
+    $('.form-horizontal div.field-alias div.aliases div').each(function(index, el) {
         aliases.push($(el).data('alias'));
     });
 
@@ -82,7 +82,7 @@ $(document).ready(function() {
         },
         keyboardShortcuts: false,
     });
-    $('.ui.submit').click(function() {
+    $('.btn.submit').click(function() {
         var input_el_length = $('input.alias').val().length;
         console.log(input_el_length);
         if (input_el_length > 0) {
@@ -101,7 +101,7 @@ $(document).ready(function() {
             submit_form();
         }
     });
-    var $button = $('<div>', {'class': 'ui add-alias button compact disabled green'}).html('<i class="icon add"></i>Add');
+    var $button = $('<div>', {'class': 'btn btn-success button-control add-alias disabled'}).html('<i class="fa fa-plus"></i> Add');
     $button.appendTo($('div.alias-button-bar'));
     $('input.alias').on('input', alias_changed);
     $('input.alias').on('change', alias_changed);
@@ -118,7 +118,7 @@ $(document).ready(function() {
 
             var current_aliases = get_aliases();
             if (current_aliases.indexOf(alias) !== -1) {
-                var el = $('.ui.form div.ui.message.warning');
+                var el = $('.form-horizontal div.ui.message.warning');
                 el.show();
                 el.text('This alias is already in use.');
                 setTimeout(function() {
@@ -142,11 +142,11 @@ $(document).ready(function() {
         onSuccess: function(response, element, xhr) {
             var input_el = $(this).parent().parent().find('input.alias');
 
-            var $div = $('<div>', {'class': 'ui label'}).text(input_el.val());
+            var $div = $('<div>', {'class': 'label label-info'}).text(input_el.val() + ' ');
             $div.appendTo(input_el.parent().parent().find('div.aliases'));
             $div.data('alias', input_el.val());
 
-            var $button = $('<i>', {'class': 'icon close red'});
+            var $button = $('<a>', {'href': '#'}).html('<i class="fa fa-times color-red"></i>');
             $button.appendTo($div);
             $button.click(function() {
                 $(this).parent().remove();
@@ -157,7 +157,7 @@ $(document).ready(function() {
             $('input[name="aliases"]').val(get_aliases().join('|'))
         },
         onFailure: function() {
-            var el = $('.ui.form div.ui.message.warning');
+            var el = $('.form-horizontal div.ui.message.warning');
             el.show();
             el.text('This alias is already in use.');
             setTimeout(function() {

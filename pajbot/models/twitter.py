@@ -91,7 +91,7 @@ class TwitterManager:
                     if tweet.user.screen_name.lower() in self.relevant_users:
                         if not tweet.text.startswith('RT ') and tweet.in_reply_to_screen_name is None:
                             tw = tweet_prettify_urls(tweet)
-                            self.bot.say('Volcania New tweet from {0}: {1}'.format(tweet.user.screen_name, tw.replace("\n", " ")))
+                            self.bot.say('New tweet from {0}: {1}'.format(tweet.user.screen_name, tw.replace("\n", " ")))
 
                 def on_error(self, status):
                     log.warning('Unhandled in twitter stream: {0}'.format(status))

@@ -2,15 +2,19 @@
 {% set active_page = 'debug' %}
 {% block title %}Debug{% endblock %}
 {% block body %}
-<h2>Debug elements! woo</h2>
-<div id="check_points" class="ui form">
-    <form>
-        <div class="field username">
-            <input type="text" placeholder="Username">
+<div class="row">
+    <div class="col-md-12">
+        <h1 class="page-head-line">Debug</h1>
+	<div id="check_points">
+            <form role="form">
+                <div class="form-group">
+                    <input type="text" class="form-control" placeholder="Username">
+                </div>
+                <button class="btn btn-primary">Submit</button>
+            </form><br />
+            <div class="alert alert-success">asd</div>
+            <div class="alert alert-danger">aa</a></div>
         </div>
-        <button class="ui submit button">Submit</button>
-    </form>
-    <div class="ui response hidden"></div>
-    <div class="ui response message green red">aa</a>
+    </div>
 </div>
 {% endblock %}

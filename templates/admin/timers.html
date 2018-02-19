@@ -3,19 +3,19 @@
 {% block title %}Admin - Timers{% endblock %}
 {% block body %}
 {% if created %}
-<div class="ui success message">
-    <i class="close icon"></i>
-    <div class="header">Your Timer was created successfully.</div>
+<div class="alert alert-success fade in message">
+    <a href="#" class="close" data-dismiss="alert" aria-label="close"><i class="fa fa-times"></i></a>
+    <strong>Your Timer was created successfully.</strong>
 </div>
 {% elif edited %}
-<div class="ui success message">
-    <i class="close icon"></i>
-    <div class="header">Your Timer was edited successfully.</div>
+<div class="alert alert-success fade in message">
+    <a href="#" class="close" data-dismiss="alert" aria-label="close"><i class="fa fa-times"></i></a>
+    <strong>Your Timer was edited successfully.</strong>
 </div>
 {% endif %}
-<button class="ui button create-timer green"><i class="icon add"></i> <strong>Create Timer</strong></button>
-<h2>Timers</h2>
-<table class="ui table basic">
+<a href="/admin/timers/create" class="btn btn-success create-timer" role="button"><i class="fa fa-plus"></i> <strong> Create Timer</strong></a>
+<h1 class="page-head-line">Timers</h1>
+<table class="table table-responsive table-striped">
     <thead>
         <tr>
             <th class="collapsing">Name</th>
@@ -37,17 +37,21 @@
         {% endfor %}
     </tbody>
 </table>
-<div class="ui modal remove-timer">
-    <i class="close icon"></i>
-    <div class="header">Confirm Action</div>
-    <div class="content">
-        <div class="description">
-            Are you sure you want to remove this timer? This action is irreversible.
+<div class="modal fade remove-timer" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header"> 
+                <button class="close" type="button" data-dismiss="modal"><i class="fa fa-times"></i></button>
+                <h4 class="modal-title">Confirm Action</h4>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to remove this timer? This action is irreversible.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" data-dismiss="modal" class="btn btn-danger remove-timer-modal">Remove</button>
+                <button type="button" data-dismiss="modal" class="btn btn-default">Cancel</button>
+            </div>
         </div>
-    </div>
-    <div class="actions">
-        <div class="ui approve button">Remove</div>
-        <div class="ui cancel button">Cancel</div>
     </div>
 </div>
 {% endblock %}
@@ -55,17 +59,9 @@
 <script src="/static/scripts/admin/create_row.js"></script>
 <script type="text/javascript">
 $(document).ready(function() {
-    $('button.create-timer').click(function() {
-        document.location.href = '/admin/timers/create';
-    });
-
     enable_edit_row('timers');
     enable_remove_row('remove-timer', 'remove_timer');
     enable_toggle_row('toggle_timer');
-
-    $('.message .close').on('click', function() {
-        $(this).closest('.message').transition('fade');
-    });
 });
 </script>
 {% endblock %}

@@ -2,13 +2,23 @@
 {% set active_page = 'admin_users' %}
 {% block title %}Moderators{% endblock %}
 {% block body %}
-<h2>Bot Moderators</h2>
-<div id="bot_moderators">
-    <table class="ui very basic table collapsing">
+<div class="row">
+    <div class="col-md-12">
+        <h1 class="page-head-line">Bot Moderators</h1>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <div id="stats">
 {% for title, users in userlists.items() %}
 {% if users|length > 0 %}
+        <div class="panel panel-default" style="border: 0;">
+            <div class="panel-heading">
+                <h4><strong>{{title}}</strong></h4>
+            </div>
+            <div class="panel-body">
+            <table class="table table-responsive table-striped">
         <thead>
-            <tr><th colspan="2"><h4>{{title}}</h4></th></tr>
             <tr>
                 <th>Username</th>
                 <th>Level</th>
@@ -22,8 +32,12 @@
             </tr>
             {% endfor %}
         </tbody>
+        </table>
+    </div>
+    </div>
 {% endif %}
 {% endfor %}
-    </table>
+        </div>
+    </div>
 </div>
 {% endblock %}

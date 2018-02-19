@@ -2,31 +2,48 @@
 {% set active_page = 'points' %}
 {% block title %}Points{% endblock %}
 {% block body %}
-<h2>Description</h2>
-<p><i class="large icon pin"></i>Subscribers gain <strong>5 points per 5 minutes</strong> while watching the stream.</p>
-<p><i class="large icon pin"></i>Non-subscribers gain <strong>1 point per 5 minutes</strong> while watching the stream.</p>
-{{ custom_content }}
-<h2>Check your own Points and Rank</h2>
-<div id="check_points" class="ui form">
-    <form>
-        <div class="field username">
-            <input type="text" placeholder="Username">
-        </div>
-        <button class="ui submit button">Submit</button>
-    </form>
-    <div class="ui response hidden"></div>
+<div class="row">
+    <div class="col-md-12">
+        <h1 class="page-head-line">Points</h1>
+        <h1 class="page-subhead-line"><i class="fa fa-paperclip fa-lg"></i> Subscribers gain <strong>5 points per 5 minutes</strong> while watching the stream.<br /><br />
+        <i class="fa fa-paperclip fa-lg"></i> Non-subscribers gain <strong>1 point per 5 minutes</strong> while watching the stream.</h1>
+    {{ custom_content }}
+    </div>
 </div>
-<h2>Points</h2>
-<div id="top_users">
-    <table class="ui very basic table">
-        <thead>
-            <tr>
-                <th>Rank</th>
-                <th>Username</th>
-                <th>Points</th>
-            </tr>
-        </thead>
-        <tbody>
+<div class="row">
+    <div class="col-md-12">
+    <div id="check_points" class="form">
+        <form class="form-inline" role="form">
+            <div class="username search">
+                <div class="form-group">
+                    <label for="focusedInput" class="control-label">Check your own Points and Rank</label>
+                    <div class="col-md-14">
+                        <input type="text" name="username" class="form-control" id="focusedInput" placeholder="Search username">
+                        <button class="btn btn-default">Submit</button>
+                    </div>
+                
+                </div>
+                
+            </div>
+        </form>
+        <div class="col-md-14" style="margin-top: 5px">
+            <div class="alert" role="alert"></div>
+        </div>
+    </div>
+
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <table class="table table-responsive table-striped">
+            <thead>
+                <tr>
+                    <th>Rank</th>
+                    <th>Username</th>
+                    <th>Points</th>
+                </tr>
+            </thead>
+            <tbody>
             {% set rank = 1 %}
             {% set index = 1 %}
             {% set last_points = -1337 %}
@@ -38,18 +55,20 @@
                 {% include 'list/user.html' %}
                 {% set index = index + 1 %}
             {% endfor %}
-        </tbody>
-    </table>
+            </tbody>												
+        </table>
+    </div>
 </div>
+
 {% endblock %}
 {% block footer %}
 <script type="text/javascript">
-$('#check_points .submit.button')
+$('#check_points .btn.btn-default')
 .api({
     action: 'get_user',
     beforeSend: function(settings) {
         settings.urlData = {
-            username: $('#check_points div.field.username input').val()
+            username: $('#check_points div.col-md-14 input').val()
         };
         return settings;
     },
@@ -57,29 +76,21 @@ $('#check_points .submit.button')
         return response.error == false || true;
     },
     onSuccess: function(response) {
-        var el = $('#check_points .response');
-        el.addClass('message green');
-        el.removeClass('red');
+        var el = $('#check_points .alert');
+        el.addClass('alert-success');
+        el.addClass('fade in');
+        el.removeClass('alert-danger');
         el.html('User <a href="/user/' + response.username + '"><strong class="username">' + response.username + '</strong></a> has <strong class="points">' + response.points + '</strong> points and is ranked <strong class="rank">' + response.rank + '</strong>.');
-        if (el.hasClass('hidden')) {
-            el.transition({
-                animation: 'slide down',
-                duration: '500ms',
-            });
-        }
+        
     },
     onFailure: function(response) {
-        var el = $('#check_points .response');
-        el.addClass('message red');
-        el.removeClass('green');
+        var el = $('#check_points .alert');
+        el.addClass('alert-danger');
+        el.addClass('fade in');
+        el.removeClass('alert-success');
         el.html('No user with the name <strong class="username">XXX</strong> found.');
-        el.find('strong.username').text($('#check_points div.field.username input').val());
-        if (el.hasClass('hidden')) {
-            el.transition({
-                animation: 'slide down',
-                duration: '500ms',
-            });
-        }
+        el.find('strong.username').text($('#check_points div.col-md-14 input').val());
+        
     }
 });
 </script>

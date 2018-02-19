@@ -2,9 +2,13 @@
 {% set active_page = 'highlights' %}
 {% block title %}404 - Highlight not found{% endblock %}
 {% block body %}
-<h2>404 - Highlight not found.</h2>
-<p><img src="/static/images/sad.png" alt="FeelsBadMan" /></p>
-<h3>Find other highlights 
-<a href="/highlights/#calendar">here</a>
-</h3>
+<div class="row">
+    <div class="col-md-12">
+        <h1 class="page-head-line">404 - Highlight not found.</h1>
+        <p><img src="/static/images/sad.png" alt="FeelsBadMan" /></p>
+        <h3>Find other highlights 
+            <a href="/highlights/#calendar">here</a>
+        </h3>
+    </div>
+</div>
 {% endblock %}

@@ -1,28 +1,32 @@
-<div class="item">
-    <div class="ui image video_thumbnail">
-        {%- include 'helper/highlight_thumbnail_img.html' -%}
-    </div>
-    <div class="content">
-<div class="header">
-    <a href="/highlights/{{ highlight.created_at|strftime('%Y-%m-%d') }}/{{ highlight.id }}" style="color: #0e407f;" class="pemote">
-        {%- if highlight.description %}
-        {{ highlight.description }} 
-        {% else %}
-            {% if highlight.stream_chunk.stream.title|length > 80 %}
-                {{ highlight.stream_chunk.stream.title[:80] }}...
-            {% else %}
-                {{ highlight.stream_chunk.stream.title }}
-            {% endif %}
-        {% endif -%}
+<div class="media">
+    <div class="media-left">
+        <a href="/highlights/{{ highlight.created_at|strftime('%Y-%m-%d') }}/{{ highlight.id }}">
+            <div class="video_thumbnail">
+                {%- include 'helper/highlight_thumbnail_img.html' -%}
+            </div>
         </a>
     </div>
+    <div class="media-body">
+        <div class="header">
+        <a href="/highlights/{{ highlight.created_at|strftime('%Y-%m-%d') }}/{{ highlight.id }}" style="color: #0e407f;" class="pemote">
+            {%- if highlight.description %}
+                {{ highlight.description }}
+            {% else %}
+                {% if highlight.stream_chunk.stream.title|length > 80 %}
+                    {{ highlight.stream_chunk.stream.title[:80] }}...
+                {% else %}
+                    {{ highlight.stream_chunk.stream.title }}
+                {% endif %}
+            {% endif -%}
+        </a>
+        </div>
         <div class="meta">
-            <span class="date">{{ highlight.created_at|time_ago }} ago | {{ highlight.created_at|date_format }}</span>
+            <span class="date">{{ highlight.created_at|time_ago }} ago | {{ highlight.created_at|strftime('%d-%m-%Y %H:%M:%S') }}</span>
         </div>
         <div class="description">
             <div>Link: <a href="{{ highlight.video_url }}">{{ highlight.video_url }}</a></div>
             {% if highlight.description %}
-            <p class="pemote">{{ highlight.stream_chunk.stream.title }}</p>
+                <p class="pemote">{{ highlight.stream_chunk.stream.title }}</p>
             {% endif %}
         </div>
     </div>
